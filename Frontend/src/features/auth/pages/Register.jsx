@@ -1,37 +1,53 @@
 import React, { useState } from "react";
+import PhoneInputPkg from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import { useAuth } from "../hook/useAuth.js";
-import {Link, useNavigate} from "react-router"
+import { Link,useNavigate} from "react-router";
+
+// react-phone-input-2 CJS/ESM interop for Vite
+const PhoneInput = PhoneInputPkg.default ?? PhoneInputPkg;
 
 /* ─────────────────────────────────────────────
-   Snitch — Login Page
+   Snitch — Register Page
    Layout: Desktop split-screen (left brand panel + right form)
            Mobile stacked (brand header → form)
 ───────────────────────────────────────────── */
-const Login = () => {
+const Register = () => {
   const [formData, setFormData] = useState({
-    identifier: "", // can be email OR username
+    fullName: "",
+    phone: "",
+    email: "",
     password: "",
+    isSeller: false,
   });
-  const { handleLogin } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const navigate=useNavigate()
+  const {handleRegister}=useAuth()
+const navigate=useNavigate()
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handlePhoneChange = (value) => {
+    setFormData((prev) => ({ ...prev, phone: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Detect if the user entered an email or a username
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier.trim());
-    const payload = isEmail
-      ? { email: formData.identifier.trim(), password: formData.password }
-      : { fullname: formData.identifier.trim(), password: formData.password };
-    console.log("Login payload:", payload);
-    console.log(payload);
-    await handleLogin(payload);
- navigate("/") 
- };
+    console.log("Form submitted:", formData);
+    await handleRegister({
+        fullname:formData.fullName,
+        email:formData.email,
+        contact:"+" + formData.phone,
+        password:formData.password,
+        isSeller:formData.isSeller
+    });
+    navigate("/")
+    // TODO: dispatch register action
+  };
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row">
@@ -45,7 +61,7 @@ const Login = () => {
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
 
-        {/* Gradient overlay */}
+        {/* Gradient overlay — dark vignette so text is legible */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
 
@@ -65,13 +81,13 @@ const Login = () => {
               Fashion &bull; Style &bull; Culture
             </p>
             <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
-              Welcome<br />
-              <span className="text-[#F5C518]">back,</span><br />
-              trendsetter.
+              Dress to<br />
+              <span className="text-[#F5C518]">express,</span><br />
+              not to impress.
             </h2>
             <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
-              Your wardrobe is waiting. Sign in and keep building your
-              signature look.
+              Discover curated streetwear, premium drops, and exclusive styles.
+              Built for those who know what they want.
             </p>
 
             {/* Stats row */}
@@ -109,80 +125,108 @@ const Login = () => {
 
           {/* Desktop heading */}
           <div className="hidden lg:block mb-8">
-            <h2 className="text-2xl font-bold text-white">Welcome back</h2>
+            <h2 className="text-2xl font-bold text-white">Create your account</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Sign in to your Snitch account.
+              Join Snitch and redefine your wardrobe.
             </p>
           </div>
 
           {/* Mobile heading */}
           <div className="lg:hidden mb-6">
-            <h2 className="text-xl font-bold text-white">Sign in</h2>
+            <h2 className="text-xl font-bold text-white">Create account</h2>
             <p className="mt-1 text-sm text-zinc-500">
-              Welcome back to Snitch.
+              Join and redefine your wardrobe.
             </p>
           </div>
 
           {/* ── FORM ── */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Email or Username */}
+            {/* Full Name */}
             <div className="space-y-1.5">
               <label
-                htmlFor="identifier"
+                htmlFor="fullName"
                 className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.2em]"
               >
-                Email or Username
+                Full Name
               </label>
               <input
-                id="identifier"
-                name="identifier"
+                id="fullName"
+                name="fullName"
                 type="text"
                 required
-                autoComplete="username"
-                placeholder="Enter your email or username"
-                value={formData.identifier}
+                placeholder="John Doe"
+                value={formData.fullName}
                 onChange={handleChange}
                 className="w-full bg-[#1A1A1A] border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600
                            focus:outline-none focus:border-[#F5C518]/70 focus:ring-1 focus:ring-[#F5C518]/30
                            hover:border-zinc-700 transition-colors duration-200"
               />
-              {/* Live hint: tells user which mode is detected */}
-              {formData.identifier.length > 0 && (
-                <p className="text-[10px] text-zinc-600 pl-0.5">
-                  Signing in as{" "}
-                  <span className="text-[#F5C518] font-semibold">
-                    {/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier.trim())
-                      ? "email"
-                      : "username"}
-                  </span>
-                </p>
-              )}
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-1.5">
+              <label className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.2em]">
+                Contact Number
+              </label>
+              <PhoneInput
+                country={"in"}
+                value={formData.phone}
+                onChange={handlePhoneChange}
+                inputProps={{
+                  name: "phone",
+                  id: "phone",
+                  required: true,
+                  placeholder: "98765 43210",
+                }}
+                containerClass="!w-full"
+                inputClass="!w-full !bg-[#1A1A1A] !border !border-zinc-800 !rounded-lg !pl-14 !pr-4 !py-3 !text-sm !text-white
+                            !placeholder-zinc-600 hover:!border-zinc-700 focus:!border-[#F5C518]/70 focus:!ring-1
+                            focus:!ring-[#F5C518]/30 !transition-colors !duration-200"
+                buttonClass="!bg-[#1A1A1A] !border !border-zinc-800 !border-r-0 !rounded-l-lg hover:!bg-[#222]"
+                dropdownClass="!bg-[#1A1A1A] !border !border-zinc-800 !text-white !rounded-lg !mt-1 !shadow-xl"
+                searchClass="!bg-[#111] !border !border-zinc-700 !text-white !rounded-md !px-3 !py-2 !text-sm"
+                enableSearch
+              />
+            </div>
+
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label
+                htmlFor="email"
+                className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.2em]"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full bg-[#1A1A1A] border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600
+                           focus:outline-none focus:border-[#F5C518]/70 focus:ring-1 focus:ring-[#F5C518]/30
+                           hover:border-zinc-700 transition-colors duration-200"
+              />
             </div>
 
             {/* Password */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.2em]"
-                >
-                  Password
-                </label>
-                <a
-                  href="/forgot-password"
-                  className="text-[10px] text-[#F5C518] hover:underline tracking-wide uppercase font-semibold transition-colors duration-200"
-                >
-                  Forgot password?
-                </a>
-              </div>
+              <label
+                htmlFor="password"
+                className="block text-[10px] font-semibold text-zinc-500 uppercase tracking-[0.2em]"
+              >
+                Password
+              </label>
               <div className="relative">
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="Enter your password"
+                  placeholder="Min. 8 characters"
                   value={formData.password}
                   onChange={handleChange}
                   className="w-full bg-[#1A1A1A] border border-zinc-800 rounded-lg px-4 py-3 pr-12 text-sm text-white placeholder-zinc-600
@@ -209,13 +253,55 @@ const Login = () => {
               </div>
             </div>
 
+            {/* isSeller Checkbox */}
+            <div
+              onClick={() => setFormData((prev) => ({ ...prev, isSeller: !prev.isSeller }))}
+              className={`flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-all duration-200
+                ${formData.isSeller
+                  ? "border-[#F5C518]/50 bg-[#F5C518]/5"
+                  : "border-zinc-800 bg-[#1A1A1A] hover:border-zinc-700"
+                }`}
+            >
+              {/* Custom checkbox */}
+              <div
+                className={`w-4.5 h-4.5 rounded flex-shrink-0 flex items-center justify-center border transition-all duration-200
+                  ${formData.isSeller
+                    ? "bg-[#F5C518] border-[#F5C518]"
+                    : "bg-transparent border-zinc-600"
+                  }`}
+              >
+                {formData.isSeller && (
+                  <svg className="w-2.5 h-2.5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-white font-medium">
+                  Register as a{" "}
+                  <span className="text-[#F5C518]">Seller</span>
+                </p>
+                <p className="text-[11px] text-zinc-500 mt-0.5">
+                  List your clothing and reach thousands of buyers
+                </p>
+              </div>
+
+              {/* Seller badge */}
+              {formData.isSeller && (
+                <span className="text-[9px] font-bold tracking-widest uppercase text-[#F5C518] border border-[#F5C518]/40 rounded px-1.5 py-0.5 flex-shrink-0">
+                  Seller
+                </span>
+              )}
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
               className="w-full bg-[#F5C518] hover:bg-[#e0b315] active:scale-[0.98] text-black font-bold text-sm
                          rounded-lg py-3.5 tracking-widest uppercase transition-all duration-200 mt-2"
             >
-              Sign In
+              Create Account
             </button>
 
           </form>
@@ -227,19 +313,16 @@ const Login = () => {
             <div className="flex-1 h-px bg-zinc-800" />
           </div>
 
-          {/* Register link */}
+          {/* Login link */}
           <p className="text-center text-sm text-zinc-500">
-            New to Snitch?{" "}
-      
-              
-            <Link className="text-[#F5C518] hover:underline font-semibold transition-colors duration-200" to="/register"> Create account</Link>
-             
-          
+            Already a Snitch member?{" "}
+                       <Link className="text-[#F5C518] hover:underline font-semibold transition-colors duration-200" to="/login"> Sign in</Link>
+
           </p>
 
           {/* Legal */}
           <p className="text-center text-[10px] text-zinc-700 mt-6 leading-relaxed">
-            By signing in you agree to Snitch's{" "}
+            By creating an account you agree to Snitch's{" "}
             <a href="#" className="underline hover:text-zinc-500 transition-colors">Terms of Service</a>
             {" "}&amp;{" "}
             <a href="#" className="underline hover:text-zinc-500 transition-colors">Privacy Policy</a>.
@@ -252,4 +335,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

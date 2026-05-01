@@ -1,13 +1,8 @@
-import  express from 'express';
+import  app from "./src/app.js"; 
 import  connectDB from './src/config/database.js';
-import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
 
-const app = express();
 
-app.use(express.json());
-app.use(morgan("dev"))
-app.use(cookieParser())
+
 
 const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {

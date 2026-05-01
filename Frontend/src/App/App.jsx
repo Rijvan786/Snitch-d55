@@ -1,11 +1,11 @@
 
+import { RouterProvider } from 'react-router'
 import './App.css'
+import { router } from './App.route.jsx'
 
 function App() {
   return (
-    <>
-    App 
-    </>
+   <RouterProvider router={router}/>
   )
 }
 

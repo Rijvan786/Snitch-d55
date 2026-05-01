@@ -1,7 +1,8 @@
-import { config } from "../config/config"
-import userModel from "../models/auth.model"
+import { config } from "../config/config.js"
+import userModel from "../models/user.model.js"
 import jwt from "jsonwebtoken"
-import { validatedAndFormat } from "../validator/contact.validator"
+import { validatedAndFormat } from "../validator/contact.validator.js"
+import bcrypt from "bcryptjs"
  
 /***TOKEN sender function  */
 
@@ -18,7 +19,7 @@ res.status(200).json({
     success:true,
 
     user:{
-        id:user_id,
+        id:user._id,
         email:user.email,
         contact:user.contact,
         fullname:user.fullname,
@@ -31,55 +32,66 @@ res.status(200).json({
 
 export async function RegisterController(req,res){
     const {email,fullname,password,contact,isSeller}=req.body
+    console.log(fullname,email,contact,password,isSeller);
     try{
          const validContact= validatedAndFormat(contact)
+         console.log(validContact);
          if(!validContact){
             return res.status(400).json({message:"Contact number is Invalid"})
          }
-       const isExist=await userModel.find({
+       const isExist=await userModel.findOne({
         $or:[
-            {email},
-            {validContact}
+              {email:email},
+              {contact:validContact}
         ]
        })
+       
+       
        if(isExist){
         return res.status(409).json({
-            message:`User  ${isExist.email==email?"email is allready registered":"is All ready registered"}`
+            message:`User  ${isExist.email==email?"email is all ready registered":"is All ready registered"}`
         })
        }
        const user=await userModel.create({
         fullname,
         email,
         password,
-        contact: validContact,
+        contact:validContact,
         countryCode:validContact.slice(0,3),
         role:isSeller?"seller":"buyer"
        })
-       SendTokenResponse(res,user,"User is register successfully")
+      await SendTokenResponse(res,user,"User is register successfully")
 
     }
     catch(err){
       console.log(err);
       return  res.status(500).json({message:"Server Error"})
     }
-
+   
 }
 
 export async function LoginController(req,res){
-        const {email,fullname,password}=req.body
+        const {fullname,email,password}=req.body
+        console.log(email,password);
         try{
-            const user=await userModel.find({
+            const user=await userModel.findOne({
            $or:[{ fullname:fullname,},
-            {email:email}
+            { email:email}
            ]
-        })
+        }).select("+password")
+        console.log(user);
         if(!user){
             return res.status(404).json({message:"User is not found"})
         }
-        
-
+    const isMatch=await user.comparePassword(password)
+        if(!isMatch){
+            return res.status(400).json({
+                message:"user enter Invalid password"
+            })
+        }
+             await SendTokenResponse(res,user,"User is logged In successfully")
         }
         catch(err){
-            return res.status(400).json({message:"Internal Server Error"})
+            return res.status(400).json({message:"Internal Server Error err by login"})
         }
 }
