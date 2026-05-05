@@ -6,7 +6,7 @@ const  Authslice=createSlice({
     initialState:{
         User:null,
         Error:null,
-        Loading:false
+        Loading:true
     },
 
     reducers:{

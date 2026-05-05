@@ -3,6 +3,8 @@ import PhoneInputPkg from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { useAuth } from "../hook/useAuth.js";
 import { Link,useNavigate} from "react-router";
+import ContinueWithGoogle from "../components/ContinuewithGoogle.jsx";
+import { AuthSkeleton } from "../../products/components/Skeleton.jsx";
 
 // react-phone-input-2 CJS/ESM interop for Vite
 const PhoneInput = PhoneInputPkg.default ?? PhoneInputPkg;
@@ -50,7 +52,8 @@ const navigate=useNavigate()
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row">
+    <AuthSkeleton>
+      <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row">
 
       {/* ── LEFT PANEL (desktop only) ── */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden flex-col">
@@ -304,6 +307,9 @@ const navigate=useNavigate()
               Create Account
             </button>
 
+          <ContinueWithGoogle/>
+           
+
           </form>
 
           {/* Divider */}
@@ -332,6 +338,7 @@ const navigate=useNavigate()
       </div>
 
     </div>
+    </AuthSkeleton>
   );
 };
 

@@ -71,7 +71,7 @@ export async function RegisterController(req,res){
 }
 
 export async function LoginController(req,res){
-        const {fullname,email,password}=req.body
+        const {fullname,email,password}=req.body;
         console.log(email,password);
         try{
             const user=await userModel.findOne({
@@ -94,4 +94,54 @@ export async function LoginController(req,res){
         catch(err){
             return res.status(400).json({message:"Internal Server Error err by login"})
         }
+}
+
+export async function GoogleCallback(req,res){
+    console.log(req.user);
+
+    const {id,displayName,emails,photos}=req.user;
+    const email=emails[0].value
+    const photo=photos[0].value
+    let user=await userModel.findOne({
+        email:email
+    }).select("+password")
+    
+    if(!user){
+      user=  await userModel.create({
+          email,
+          googleId:id,
+          fullname:displayName  
+        })
+    }
+    const token=jwt.sign({
+        id:user._id,
+
+    },
+       config.JWT_SECRET, {
+        expiresIn:"7d"
+       }
+)
+res.cookie("token",token)
+    res.redirect("http://localhost:5173/")
+}
+
+
+export async function GetmeController(req,res){
+    const user=req.user
+
+    
+   
+
+console.log("okeoke",user);
+        res.status(200).json({
+            message:"Fetch user is successfully",
+        user:{
+        id:user._id,
+        email:user.email,
+        contact:user.contact,
+        fullname:user.fullname,
+        role:user.role
+            }
+        })
+    
 }

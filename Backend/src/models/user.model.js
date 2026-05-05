@@ -9,17 +9,19 @@ const userSchema=new mongoose.Schema({
         },
     contact:{
         type:String,
-        required:true
+        required:false   // temperory patch 
 
     },
      countryCode:{   
          type:String,
-          required:true
+         
     },
     password:{
         type:String,
         select:false,
-        required:true
+        required:function (){
+            return !this.googleId
+        }
 
     },
     fullname:{
@@ -30,6 +32,9 @@ const userSchema=new mongoose.Schema({
         type:String,
         enum:["buyer","seller"],
         default:"buyer"
+    },
+    googleId:{
+        type:String
     }
 })
 

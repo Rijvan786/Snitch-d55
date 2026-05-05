@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useAuth } from "../hook/useAuth.js";
-import {Link, useNavigate} from "react-router"
+import {Link, Navigate, useNavigate} from "react-router"
+import ContinueWithGoogle from "../components/ContinuewithGoogle.jsx";
+import { useSelector } from "react-redux";
+import { AuthSkeleton } from "../../products/components/Skeleton.jsx";
 
 /* ─────────────────────────────────────────────
    Snitch — Login Page
@@ -13,6 +16,8 @@ const Login = () => {
     password: "",
   });
   const { handleLogin } = useAuth();
+  const User=useSelector(state=>state.auth.User)
+  // console.log(User);
   const [showPassword, setShowPassword] = useState(false);
   const navigate=useNavigate()
   const handleChange = (e) => {
@@ -30,11 +35,14 @@ const Login = () => {
     console.log("Login payload:", payload);
     console.log(payload);
     await handleLogin(payload);
- navigate("/") 
+    navigate("/seller/create-product")
+    
+
  };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row">
+    <AuthSkeleton>
+      <div className="min-h-screen bg-[#0D0D0D] flex flex-col lg:flex-row">
 
       {/* ── LEFT PANEL (desktop only) ── */}
       <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden flex-col">
@@ -217,6 +225,7 @@ const Login = () => {
             >
               Sign In
             </button>
+          <ContinueWithGoogle/>
 
           </form>
 
@@ -249,6 +258,7 @@ const Login = () => {
       </div>
 
     </div>
+    </AuthSkeleton>
   );
 };
 
