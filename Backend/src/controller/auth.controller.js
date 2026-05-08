@@ -122,8 +122,13 @@ export async function GoogleCallback(req,res){
        }
 )
 res.cookie("token",token)
+    if(user.role=="seller"){
+        res.redirect("http://localhost:5173/seller/dashboard")
+}
+else if(user.role=="buyer"){
     res.redirect("http://localhost:5173/")
 }
+    }
 
 
 export async function GetmeController(req,res){

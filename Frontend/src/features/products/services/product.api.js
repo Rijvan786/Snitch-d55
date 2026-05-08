@@ -19,3 +19,42 @@ export async function GetSellerProduct() {
     return response.data
     
 }
+
+export async function GetallProduct(){
+
+    const response=await api.get("/")
+       
+    return response.data
+}
+
+export async function ViewDetailProduct(ProductId) {
+
+    const response=await api.get(`/${ProductId}`)
+    return response.data
+    
+}
+
+export async function ProductEditSeller({ProductId,title,description,priceAmount}){
+    
+    const response=await api.put( `/Edit-Product/${ProductId} `,{
+        title,
+        description,
+        priceAmount
+    })
+    return response.data
+
+
+}
+export async function AddVariant({formdata,ProductId}){
+    
+    const response=await api.post(`/Add-Variant/${ProductId}`,formdata)
+    return response.data
+}
+
+export async function RelatedVariantData({VariantId}){
+    
+    const response=await api.get(`/Related-Variant/${VariantId}`)
+    return response.data
+}
+
+   

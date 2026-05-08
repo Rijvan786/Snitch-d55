@@ -60,7 +60,7 @@ export async function AuthenticateSeller(req,res,next){
          next()
      }
      catch(err){
-        return req.status(400).json({
+        return res.status(400).json({
             message:`Bad Request ${err}`
         })
      }

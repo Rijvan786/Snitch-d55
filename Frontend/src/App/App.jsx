@@ -4,14 +4,18 @@ import './App.css'
 import { router } from './App.route.jsx'
 import { useEffect } from 'react'
 import { useAuth } from '../features/auth/hook/useAuth.js'
+import { useSelector } from 'react-redux'
 
 function App() {
 
 
-const {handleGetme}=useAuth()
+const user=useSelector(state=>state.auth.User)
+console.log(user);
+const {handleGetMe}=useAuth()
 
-  useEffect(function(){
-    handleGetme()
+
+  useEffect(()=>{
+    handleGetMe()
   },[])
   return (
    <RouterProvider router={router}/>

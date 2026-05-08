@@ -4,7 +4,7 @@ import "react-phone-input-2/lib/style.css";
 import { useAuth } from "../hook/useAuth.js";
 import { Link,useNavigate} from "react-router";
 import ContinueWithGoogle from "../components/ContinuewithGoogle.jsx";
-import { AuthSkeleton } from "../../products/components/Skeleton.jsx";
+import { AuthSkeleton } from "../../../App/Skeleton.jsx"; 
 
 // react-phone-input-2 CJS/ESM interop for Vite
 const PhoneInput = PhoneInputPkg.default ?? PhoneInputPkg;

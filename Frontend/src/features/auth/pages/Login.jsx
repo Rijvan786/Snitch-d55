@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../hook/useAuth.js";
 import {Link, Navigate, useNavigate} from "react-router"
 import ContinueWithGoogle from "../components/ContinuewithGoogle.jsx";
 import { useSelector } from "react-redux";
-import { AuthSkeleton } from "../../products/components/Skeleton.jsx";
+import { AuthSkeleton } from "../../../App/Skeleton.jsx";
 
 /* ─────────────────────────────────────────────
    Snitch — Login Page
@@ -27,15 +27,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Detect if the user entered an email or a username
+   try{
+     // Detect if the user entered an email or a username
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier.trim());
     const payload = isEmail
       ? { email: formData.identifier.trim(), password: formData.password }
       : { fullname: formData.identifier.trim(), password: formData.password };
     console.log("Login payload:", payload);
     console.log(payload);
-    await handleLogin(payload);
-    navigate("/seller/create-product")
+ 
+    const user= await handleLogin(payload);
+  console.log(user);
+     if(user.role=="seller"){
+        navigate("/seller/dashboard")
+   }
+   else if(user.role=="buyer"){
+        navigate("/")
+   }
+   
+
+ 
+   
+   
+ 
+   }catch(err){
+       console.log(err.message);
+   }
     
 
  };

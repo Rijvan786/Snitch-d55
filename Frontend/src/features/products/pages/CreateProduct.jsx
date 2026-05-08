@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { useProduct } from "../hook/useProduct.js";
-import { CreateProductSkeleton } from "../components/Skeleton.jsx";
+import { CreateProductSkeleton } from "../../../App/Skeleton.jsx"; 
 
 /* ─────────────────────────────────────────────────────────────────────────
    Stitch design reference: Editorial Minimalist — Inter, neutral palette,
@@ -128,7 +128,8 @@ const inputCls =
 /* ─────────────────────────────────────────────────────────────────────────
    Main Component
    ───────────────────────────────────────────────────────────────────────── */
-export const CreateProduct = () => {
+export const 
+CreateProduct = () => {
   const { handleCreateProduct } = useProduct();
 
   /* ── consolidated form state ── */

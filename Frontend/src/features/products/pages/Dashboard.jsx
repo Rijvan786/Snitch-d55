@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useProduct } from "../hook/useProduct.js";
 import { useNavigate } from "react-router";
-import { DashboardSkeleton } from "../components/Skeleton.jsx";
+import { DashboardSkeleton } from "../../../App/Skeleton.jsx";
 
 /* ─── Stitch design: Editorial Minimalist ───────────────────────────────────
    Inter · #FAFAFA bg · #1A1A1A text · hairline #E5E5E5 borders · no shadows
@@ -57,6 +57,8 @@ function ProductCard({ product }) {
   const navigate = useNavigate();
   const coverImg = product.images?.[0]?.url;
   const extraImgs = product.images?.slice(1, 4) ?? [];
+    const loading = useSelector((state) => state.auth.Loading);
+    console.log(loading,"skelton");
 
   return (
     <article className="group bg-white border border-[#E5E5E5] rounded-lg overflow-hidden flex flex-col transition-colors hover:border-[#C4C7C7]">
@@ -140,7 +142,7 @@ function ProductCard({ product }) {
               Edit
             </button>
             <button
-              onClick={() => navigate(`/products/${product._id}`)}
+              onClick={() => navigate(`/seller/products/${product._id}`)}
               className="text-xs font-medium text-[#1A1A1A] hover:underline transition-colors"
             >
               View →
@@ -174,17 +176,19 @@ function EmptyState({ onAdd }) {
 }
 
 /* ── Main Dashboard Component ── */
-const Dashboard = () => {
-  const { handleGetSellerProuduct } = useProduct();
+const   Dashboard = () => {
+  const { handleGetSellerProduct } = useProduct();
   const products = useSelector((state) => state.product.products);
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
   const [activeNav, setActiveNav] = useState("Inventory");
+    const loading = useSelector((state) => state.auth.Loading);
+    console.log(loading,"dashboard  ");
 
   useEffect(() => {
-    handleGetSellerProuduct();
+    handleGetSellerProduct();
   }, []);
 
   /* filter by search */
@@ -281,7 +285,7 @@ const Dashboard = () => {
             </div>
 
             <button
-              onClick={() => navigate("/create-product")}
+              onClick={() => navigate("/seller/create-product")}
               className="self-start sm:self-auto h-11 rounded-md bg-[#1A1A1A] px-6 text-sm font-medium tracking-wide text-white hover:bg-[#333333] transition-colors whitespace-nowrap flex items-center gap-2"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

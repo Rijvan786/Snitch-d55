@@ -18,6 +18,7 @@ const THEME = { baseColor: "#EBEBEB", highlightColor: "#F5F5F5" };
    ───────────────────────────────────────────────────────── */
 export function DashboardSkeleton({ children }) {
   const loading = useSelector((state) => state.auth.Loading);
+  console.log(loading,"skelton");
 
   if (!loading) return children;
 
