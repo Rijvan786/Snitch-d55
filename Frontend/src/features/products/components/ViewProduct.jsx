@@ -7,34 +7,34 @@ import { useNavigate, useParams } from 'react-router';
 const sym = (c) => ({ INR: '₹', USD: '$', EUR: '€', GBP: '£' }[c] ?? c);
 
 const ViewProduct = () => {
-  const { handleViewDetailProduct,handleRelatedVariant } = useProduct();
+  const { handleViewDetailProduct } = useProduct();
   const {ProductId}=useParams()
   console.log(ProductId);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
   const user = useSelector((state) => state.auth.User);
-  const product= useSelector((state) => state.product.ViewProduct);
-  console.log(product);
- 
   const [zoomImage, setZoomImage] = useState(null);
-
+  const [product,setProduct]=useState(null)
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [variants, setVariants] = useState([]);
   const [activeVariant, setActiveVariant] = useState(null);
   const [hoveredVariant, setHoveredVariant] = useState(null);
 
   async function fetchProduct(){
-     await handleViewDetailProduct(ProductId);
-     const data = await handleRelatedVariant({VariantId:ProductId});
-     if (data) {
-         setVariants(Array.isArray(data) ? data : [data]);
-     }
+   const data=  await handleViewDetailProduct(ProductId);
+   setProduct(data.product)
+console.log(product);
   }
-    useEffect(() => {
-    // Relying on previously fetched product or routing state for ViewProduct details
+  useEffect(() => {
    fetchProduct()
   }, [ProductId]);
+
+  useEffect(() => {
+    if (product?.variants?.length > 0) {
+      setVariants(product.variants);
+    }
+  }, [product]);
 
   // Loading / Empty State
   if (!product) {
@@ -50,9 +50,10 @@ const ViewProduct = () => {
   const price = displayProduct.price || product.price;
   const images = displayProduct.images?.length > 0 ? displayProduct.images : (product.images || []);
 
-  const priceFormatted = typeof price === 'object' && price !== null
-      ? `${sym(price.currency || 'INR')}${price.amount?.toLocaleString() || '0'}`
-      : `₹${Number(price || 0).toLocaleString()}`;
+  const currencySymbol = sym(price?.currency || product?.price?.currency || product?.currency || 'INR');
+  const priceFormatted = price?.amount 
+      ? `${currencySymbol}${price.amount.toLocaleString()}`
+      : `${currencySymbol}${Number(price || 0).toLocaleString()}`;
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] font-[Inter,sans-serif] text-[#F5F5F0] selection:bg-[#F5C518] selection:text-black pb-32">
@@ -162,34 +163,47 @@ const ViewProduct = () => {
             {/* Description */}
             <div className="mb-12">
                <h3 className="text-[10px] text-zinc-500 tracking-[0.3em] uppercase mb-4">The Details</h3>
-               <p className="text-sm text-zinc-400 leading-relaxed max-w-md font-light">
+               <p className="text-sm text-zinc-400 leading-relaxed max-w-md font-light mb-6">
                  {description}
                </p>
+               {displayProduct.attributes && Object.keys(displayProduct.attributes).length > 0 && (
+                 <div className="flex flex-wrap gap-2">
+                   {Object.entries(displayProduct.attributes).map(([key, val]) => (
+                     <span key={key} className="text-[10px] border border-zinc-800 text-zinc-400 px-3 py-1 tracking-[0.2em] uppercase">
+                       <strong className="text-white">{key}:</strong> {val}
+                     </span>
+                   ))}
+                 </div>
+               )}
             </div>
 
             {/* Variants List */}
             {variants && variants.length > 0 && (
               <div className="border-t border-zinc-900 pt-8 max-w-md mb-12">
                   <h3 className="text-[10px] text-zinc-500 tracking-[0.3em] uppercase mb-4">Available Variants</h3>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-4">
                       {[product, ...variants].map((v) => {
-                          const vPriceFormatted = typeof v.price === 'object' && v.price !== null
-                              ? `${sym(v.price.currency || 'INR')}${v.price.amount?.toLocaleString() || '0'}`
-                              : `₹${Number(v.price || 0).toLocaleString()}`;
+                          const vPriceFormatted = v.price?.amount 
+                              ? `${currencySymbol}${v.price.amount.toLocaleString()}`
+                              : `${currencySymbol}${Number(v.price || 0).toLocaleString()}`;
                           
                           return (
                               <div 
-                                  key={v._id} 
-                                  className={`border bg-transparent transition-all cursor-pointer flex flex-col w-[72px] shrink-0 ${activeVariant?._id === v._id ? 'border-[#F5C518]' : 'border-zinc-700 hover:border-white'}`}
+                                  key={v._id || Math.random()} 
+                                  className={`border transition-all duration-300 ease-out cursor-pointer flex flex-col w-[72px] shrink-0 ${activeVariant?._id === v._id ? 'bg-[#F5C518]/10 border-[#F5C518]' : 'border-zinc-700 hover:border-white hover:bg-white/5'}`}
                                   onClick={() => { setActiveVariant(v); setMainImageIndex(0); }}
-                                  onMouseEnter={() => setHoveredVariant(v)}
-                                  onMouseLeave={() => setHoveredVariant(null)}
-                                  title={v.title}
+                                 
+                                 
+                                  title={v.title || 'Variant'}
                               >
                                   {/* Variant Image - White Background like Amazon */}
-                                  <div className="w-full h-[85px] bg-white flex items-center justify-center overflow-hidden p-0.5">
-                                      {v.images && v.images.length > 0 ? (
-                                          <img src={v.images[0].url || v.images[0]} alt="Variant" className="w-full h-full object-contain" />
+                                  <div 
+                                      className="w-full h-[85px] bg-white flex items-center justify-center overflow-hidden p-0.5"
+                                      onMouseEnter={() => setHoveredVariant(v)}
+
+                                  >
+                                      {(v.images && v.images.length > 0) || (product.images && product.images.length > 0) ? (
+                                          <img src={v.images?.length > 0 ? (v.images[0].url || v.images[0]) : (product.images[0]?.url || product.images[0])} alt="Variant" className="w-full h-full object-contain mix-blend-multiply" />
                                       ) : (
                                           <span className="text-[8px] text-zinc-400 uppercase">No Img</span>
                                       )}
@@ -198,8 +212,7 @@ const ViewProduct = () => {
                                   {/* Details */}
                                   <div className="p-1.5 flex flex-col bg-[#111]">
                                       <span className="text-[11px] text-white font-semibold leading-tight">{vPriceFormatted}</span>
-                                      <div className="flex justify-between items-center mt-1">
-                                          <span className="text-[9px] text-zinc-400 uppercase leading-none">{v.size || v.Size || 'N/A'}</span>
+                                      <div className="flex justify-end items-center mt-1">
                                           <div className={`w-1.5 h-1.5 rounded-full ${Number(v.stock) > 0 ? 'bg-green-500' : 'bg-red-500'}`} title={`Stock: ${v.stock || 0}`}></div>
                                       </div>
                                   </div>
@@ -208,22 +221,26 @@ const ViewProduct = () => {
                       })}
                   </div>
 
-                  {/* Specific Size Boxes */}
+                  {/* Specific Attribute Selectors */}
                   <div className="mt-8">
-                      <h3 className="text-[10px] text-zinc-500 tracking-[0.3em] uppercase mb-3">Sizes</h3>
-                      <div className="flex flex-wrap gap-2">
-                          {[product, ...variants].map((v) => (
-                              <div 
-                                  key={`size-${v._id}`} 
-                                  className={`border bg-transparent transition-all cursor-pointer flex items-center justify-center min-w-[44px] px-3 py-2 group ${activeVariant?._id === v._id ? 'border-[#F5C518]' : 'border-zinc-700 hover:border-white'}`}
-                                  onClick={() => { setActiveVariant(v); setMainImageIndex(0); }}
-                                  onMouseEnter={() => setHoveredVariant(v)}
-                                  onMouseLeave={() => setHoveredVariant(null)}
-                                  title={`Stock: ${v.stock || 0}`}
-                              >
-                                  <span className={`text-[11px] font-bold uppercase leading-none ${activeVariant?._id === v._id ? 'text-[#F5C518]' : 'text-zinc-300 group-hover:text-white'}`}>{v.size || v.Size || 'N/A'}</span>
-                              </div>
-                          ))}
+                      <h3 className="text-[10px] text-zinc-500 tracking-[0.3em] uppercase mb-3">Quick Select</h3>
+                      <div className="flex flex-wrap gap-3">
+                          {[product, ...variants].map((v, i) => {
+                              const vSize = v.attributes?.Size || v.attributes?.size || v.size || v.Size;
+                              const vColor = v.attributes?.Color || v.attributes?.color || v.color || v.Color;
+                              const label = [vSize, vColor].filter(Boolean).join(' / ') || `Option ${i+1}`;
+                              
+                              return (
+                                  <div
+                                      key={`attr-${v._id || i}`} 
+                                      className={`border transition-all duration-300 ease-out cursor-pointer flex items-center justify-center min-w-[60px] px-4 py-3 group ${activeVariant?._id === v._id ? 'bg-[#F5C518]/10 border-[#F5C518] shadow-[0_0_10px_rgba(245,197,24,0.15)]' : 'bg-transparent border-zinc-700 hover:border-white hover:bg-white/5'}`}
+                                      onClick={() => { setActiveVariant(v); setMainImageIndex(0); }}
+                                      title={`Stock: ${v.stock || 0}`}
+                                  >
+                                      <span className={`text-[11px] font-bold uppercase leading-none transition-colors duration-300 ${activeVariant?._id === v._id ? 'text-[#F5C518]' : 'text-zinc-300 group-hover:text-white'}`}>{label}</span>
+                                  </div>
+                              );
+                          })}
                       </div>
                   </div>
               </div>

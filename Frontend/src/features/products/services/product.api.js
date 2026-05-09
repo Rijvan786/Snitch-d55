@@ -34,27 +34,14 @@ export async function ViewDetailProduct(ProductId) {
     
 }
 
-export async function ProductEditSeller({ProductId,title,description,priceAmount}){
+export async function AddVariants({formData,ProductId}){
     
-    const response=await api.put( `/Edit-Product/${ProductId} `,{
-        title,
-        description,
-        priceAmount
-    })
-    return response.data
+    const response=await api.post(`/${ProductId}/variants`,formData)
 
+      return response.data
 
 }
-export async function AddVariant({formdata,ProductId}){
-    
-    const response=await api.post(`/Add-Variant/${ProductId}`,formdata)
-    return response.data
-}
 
-export async function RelatedVariantData({VariantId}){
-    
-    const response=await api.get(`/Related-Variant/${VariantId}`)
-    return response.data
-}
+
 
    

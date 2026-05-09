@@ -201,7 +201,8 @@ CreateProduct = () => {
             formdata.append("description",  formData.description);
              formdata.append("priceAmount", formData.priceAmount);
              formdata.append("priceCurrency", formData.priceCurrency);
-             images.forEach( img  =>formdata.append("images", img.file))
+             images.forEach( img  =>  formdata.append("images", img.file))
+             images.forEach(img=>console.log(img,"Images"))
       setSubmitting(true);
       await handleCreateProduct(formdata);
     } catch (error) {

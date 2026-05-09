@@ -1,6 +1,6 @@
 import {useDispatch} from "react-redux"
 import { setError, setLoading } from "../../auth/state/authslice"
-import { AddVariant, Createproduct, GetallProduct, GetSellerProduct, ProductEditSeller, RelatedVariantData, ViewDetailProduct } from "../services/product.api"
+import {AddVariants, Createproduct, GetallProduct, GetSellerProduct, ViewDetailProduct } from "../services/product.api"
 import { addToCart, Setallproduct, setProducts, SetViewProduct } from "../product.slice"
 
 export  function useProduct(){
@@ -57,53 +57,36 @@ dispatch(setError(err.message))    }
      dispatch(setLoading(true))
     const data=await ViewDetailProduct(ProductId)
        
-      dispatch(SetViewProduct(data.product))
+       
       dispatch(addToCart(data.product))
 
       dispatch(setLoading(false))
+      return data
     
   }
-
-  async function handleEditProduct({ProductId,title,description,priceAmount}) {
-    try {
-       dispatch(setLoading(true))
-
-      const data=await ProductEditSeller({ProductId,title,description,priceAmount})
-      
-      return data.product
-    } catch (error) {
-      
-      dispatch(setError(error.message))
-    }
-    finally{
-      dispatch(setLoading(false))
-    }
-  }
-
-  async function handleAddVariant({ProductId,formdata}) {
-
-    try {
-      dispatch(setLoading(true))
-      const data=await AddVariant({ProductId,formdata})
-      
-      return data.product
-    } catch (error) {
-      
-      dispatch(setError(error.message))
-    }
-    finally{
-          dispatch(setLoading(false))
-    }
+ async function handleAddVariant({formData,ProductId}){ 
+    console.log(formData);
+    console.log(`Data of Handle Add Variant ${formData} & ${ProductId}`);
     
-  }
+       try{
+        dispatch(setLoading(true))
 
-  async function handleRelatedVariant({VariantId}) {
-         
-         const data=await RelatedVariantData({VariantId})
-         return data.RelatedVariant
-  }
+        const data=await AddVariants({formData,ProductId})
+        return data.product
+       }
+       catch(err){
+             console.log(err.message);
+       }
+       finally{
+           setLoading(false)
+       }
+ }
+  
 
-  return {handleCreateProduct, handleGetSellerProduct,handleGETallProduct,handleViewDetailProduct,
-    handleEditProduct,handleAddVariant,handleRelatedVariant
-  }
+  return {handleCreateProduct, 
+    handleGetSellerProduct,
+    handleGETallProduct,
+    handleViewDetailProduct,
+    handleAddVariant
+    }
 }

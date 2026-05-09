@@ -9,9 +9,7 @@ import Payment from "../features/products/pages/Payment";
 
 import Addtocart from "../features/products/components/Addtocart";
 import Protected from "../features/auth/components/Protected";
-import SellerViewProduct from "../features/products/components/SellerViewProduct";
-import EditProduct from "../features/products/components/EditProduct";
-
+import SellerViewProduct from "../features/products/components/SellerViewProduct";  
 const role ="seller"
 export const router=createBrowserRouter([{
     path:"/",
@@ -60,12 +58,7 @@ export const router=createBrowserRouter([{
                 <SellerViewProduct/>
             </Protected>
         },
-        {
-            path:"/seller/EditProduct/:ProductId",
-            element:<Protected role="seller"> 
-                <EditProduct/>
-            </Protected>
-        }
+   
     ]
 }
 

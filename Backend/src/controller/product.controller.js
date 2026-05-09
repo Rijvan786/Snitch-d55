@@ -82,89 +82,58 @@ export async function ViewProductDetailController(req,res) {
         }
 
         res.status(200).json({
+          message:"Get product Successfully",
           product
         })
   
 }
-export async function EditProductController(req,res){
-   try {
 
-    const {ProductId}=req.params
-    let {title,description,priceAmount}=req.body; 
-    console.log(ProductId);
- const product=await ProductModel.findByIdAndUpdate(
-      {_id:ProductId}
-,
-     {
-        title:title
-      },
-    {description:description},
-    {priceAmount:priceAmount})
-
-  res.status(200).json({
-    message:"Edit product successfully "
-  })
-    
-   } catch (error) {
-          console.log(error.message);
-  
-}
-}
-
-export async function AddVariantController(req,res){
-  try{
-        const {ProductId}=req.params
-   let {title,description,priceCurrency,priceAmount,stock,size,}=req.body; 
-           priceAmount=req.body.priceAmount
-                     Number(priceAmount)
-    console.log("CreateProductController",title,description,typeof(priceAmount),priceCurrency);
-
-    const seller=req.user;
-     
-  
-       
-      const images=await Promise.all(req.files.map(async(file)=>{
-        return await uploadFile({
-            buffer:file.buffer,
-            fileName:file.originalname
-        })
-      }))
-      console.log("IMages",images,);
+export async  function  AddProductVariantController(req,res){
       
+          const ProductId=req.params.ProductId
+           
+          const product=await ProductModel.findOne({
+            _id:ProductId,
+            seller:req.user.id
+          })
 
-      const product =await VariantModel.create({
-        Product:ProductId,
-        title,
-        description,
-        price:{
-            amount:priceAmount,
-            currency:priceCurrency || "INR"
-        },
-        stock,
-        size,
-        images,
-        seller:seller.id
-      })
-      res.status(200).json({
-        message:"Product created successfully",
-        success:true,
-        product
-      })
-  }
-  catch(err){
-    console.log(err.message);
-  }
-  
-}
+          if(!product){
+            return res.status(404).json({
+              message:"Product is not found"
+            })
+          }
+           const files=req.files;
+           const images=[];
 
-export async function ViewRelatedVariantController(req,res) {
-         const {VariantId}=req.params
-         console.log(VariantId,"Variantid");
-        const RelatedVariant=await VariantModel.find({Product:VariantId})
+           if(files || files.length !==0){
 
+             (await Promise.all(files.map(async(file)=>{
+              const image=await uploadFile({
+              buffer:file.buffer,
+              fileName:file.originalname,
+            })
+             return image
+             }))).map(image=>images.push(image))
+           
+           }
+           const price =req.body.price
+           const stock=req.body.stock
+           const attributes=JSON.parse(req.body.attributes || "{}")
+           console.log(product,images,price,stock,attributes);
 
-        res.status(200).json({
-          message:"Fetch Successfully of related Variant ",
-          RelatedVariant
-        })
+           product.variants.push({
+            images,
+            price:{
+              amount:price || product.price.amount,
+              currency:req.body.priceCurrency|| product.price.currency,
+            },
+              stock,
+              attributes
+           })
+           await product.save()
+           return res.status(200).json({
+            message:"Product Variant added Successfully",
+            success:true,
+            product
+           })
 }
