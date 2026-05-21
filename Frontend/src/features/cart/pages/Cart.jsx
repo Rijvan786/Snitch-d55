@@ -86,7 +86,7 @@ async function getCartItems() {
   }, []);
   const handlePayment = () => {
     const options = {
-      key: "rzp_test_Ss1tIjXWVEufIL",
+      key: "TTTTTTTT",
       amount: 50000, // Amount in paise
       currency: "INR",
       name: "Test Company",
