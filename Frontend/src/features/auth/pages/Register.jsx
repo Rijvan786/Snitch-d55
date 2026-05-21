@@ -89,7 +89,7 @@ const navigate=useNavigate()
               not to impress.
             </h2>
             <p className="text-sm text-zinc-400 max-w-xs leading-relaxed">
-              Discover curated streetwear, premium drops, and exclusive styles.
+              Discover curated  , premium drops, and exclusive styles.
               Built for those who know what they want.
             </p>
 

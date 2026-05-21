@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useProduct } from '../hook/useProduct';
+import { useSelector } from 'react-redux';
 
 const sym = (c) => ({ INR: '₹', USD: '$', EUR: '€', GBP: '£' }[c] ?? c);
 
@@ -15,11 +16,31 @@ const SellerViewProduct = () => {
     const { ProductId } = useParams();
     const navigate = useNavigate();
     const { handleViewDetailProduct,handleAddVariant} = useProduct();
+    const sellerProducts = useSelector((s) => s.product.products) ?? [];
     
     const [product, setProduct] = useState(null);
     const [variants, setVariants] = useState([]);
     const [activeVariant, setActiveVariant] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Search
+    const [search, setSearch] = useState('');
+    const [searchOpen, setSearchOpen] = useState(false);
+    const searchRef = useRef(null);
+
+    const filtered = useMemo(() =>
+      search.trim() === '' ? [] : sellerProducts.filter(p =>
+        p.title?.toLowerCase().includes(search.toLowerCase())
+      ).slice(0, 6)
+    , [search, sellerProducts]);
+
+    useEffect(() => {
+      const handler = (e) => {
+        if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false);
+      };
+      document.addEventListener('mousedown', handler);
+      return () => document.removeEventListener('mousedown', handler);
+    }, []);
 
     // Image Gallery State
     const [currentImgIdx, setCurrentImgIdx] = useState(0);
@@ -71,10 +92,12 @@ const SellerViewProduct = () => {
         }));
     };
     
-    const [newImages, setNewImages] = useState(null);
-    const [previewUrls, setPreviewUrls] = useState([]);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    // Image upload — same pattern as CreateProduct.jsx
+    const MAX_IMAGES = 7;
+    const [images, setImages] = useState([]);      // [{ file, preview }]
     const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formError, setFormError] = useState('');
     const [showVariantForm, setShowVariantForm] = useState(false);
 
@@ -107,33 +130,32 @@ const SellerViewProduct = () => {
         localStorage.setItem(`draft_${ProductId}_stock`, variantForm.stock);
     }, [variantForm, ProductId]);
 
-    // Drag & Drop Handlers
-    const handleImageSelect = (e) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            if (files.length > 7) {
-                setFormError('You can upload up to 7 images only.');
-                return;
-            }
-            setFormError('');
-            setNewImages(files);
-            setPreviewUrls(files.map(f => URL.createObjectURL(f)));
-        }
+    // ── image helpers (mirrors CreateProduct.jsx) ──
+    const addFiles = (files) => {
+        const slots = MAX_IMAGES - images.length;
+        if (slots <= 0) return;
+        const incoming = Array.from(files).filter(f => f.type.startsWith('image/')).slice(0, slots);
+        const mapped = incoming.map(file => ({ file, preview: URL.createObjectURL(file) }));
+        setImages(prev => [...prev, ...mapped]);
     };
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        if (e.dataTransfer.files) {
-            const files = Array.from(e.dataTransfer.files);
-            if (files.length > 7) {
-                setFormError('You can upload up to 7 images only.');
-                return;
-            }
-            setFormError('');
-            setNewImages(files);
-            setPreviewUrls(files.map(f => URL.createObjectURL(f)));
-        }
+
+    const handleFileChange = (e) => {
+        addFiles(e.target.files);
+        e.target.value = '';
     };
+
+    const removeImage = (i) => {
+        setImages(prev => {
+            const copy = [...prev];
+            URL.revokeObjectURL(copy[i].preview);
+            copy.splice(i, 1);
+            return copy;
+        });
+    };
+
+    const onDragOver  = (e) => { e.preventDefault(); setIsDragging(true); };
+    const onDragLeave = ()  => setIsDragging(false);
+    const onDrop      = (e) => { e.preventDefault(); setIsDragging(false); addFiles(e.dataTransfer.files); };
 
     const handleCreateVariant = async (e) => {
         e.preventDefault();
@@ -158,23 +180,19 @@ const SellerViewProduct = () => {
             
             formData.append('price', variantForm.price);
             formData.append('stock', variantForm.stock);
-            if (newImages) {
-                for (let i = 0; i < newImages.length; i++) {
-                    console.log(newImages[i])
-                    formData.append('images', newImages[i]);
-                }
-            }    
-            await  handleAddVariant({formData,ProductId})
+            images.forEach(img => formData.append('images', img.file));
 
-            setIsSubmitting(false)
+            await handleAddVariant({ formData, ProductId });
+
+            setIsSubmitting(false);
             // Reset form
             setVariantForm({
                 attributes: [{ name: 'Size', value: '' }],
                 price: '',
                 stock: ''
             });
-            setNewImages(null);
-            setPreviewUrls([]);
+            images.forEach(img => URL.revokeObjectURL(img.preview));
+            setImages([]);
             setShowVariantForm(false);
 
             // Clear draft from LocalStorage
@@ -208,17 +226,69 @@ const SellerViewProduct = () => {
     return (
         <div className="min-h-screen bg-[#F9F9F9] font-[Inter,sans-serif] text-[#1A1A1A] pb-32">
             
-            <nav className="sticky top-0 inset-x-0 z-40 flex items-center justify-between px-8 xl:px-[40px] h-24 bg-white/90 backdrop-blur-md border-b border-[#E5E5E5]">
+            <nav className="sticky top-0 inset-x-0 z-40 flex items-center gap-4 px-6 xl:px-10 h-16 bg-white/95 backdrop-blur-md border-b border-[#E5E5E5]">
+                {/* Back */}
                 <button 
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-4 group"
+                    className="flex items-center gap-3 group shrink-0"
                 >
-                    <div className="w-8 h-[1px] bg-[#1A1A1A] group-hover:w-12 transition-all duration-300"></div>
-                    <span className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#757575] group-hover:text-[#1A1A1A] transition-colors">
-                        Back to Dashboard
-                    </span>
+                    <div className="w-7 h-[1px] bg-[#BBBBBB] group-hover:w-10 transition-all duration-300 group-hover:bg-[#1A1A1A]"></div>
+                    <span className="hidden sm:inline text-[10px] font-semibold tracking-[0.1em] uppercase text-[#AAAAAA] group-hover:text-[#1A1A1A] transition-colors">Dashboard</span>
                 </button>
-                <span className="text-[#1A1A1A] text-[12px] font-medium tracking-[0.02em] uppercase leading-none">Seller Details</span>
+
+                {/* Brand */}
+                <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-[#1A1A1A] shrink-0">SNITCH</span>
+                <span className="text-[10px] text-zinc-400 tracking-[0.15em] uppercase shrink-0 hidden sm:inline">/ Product</span>
+
+                {/* Search */}
+                <div className="flex-1 max-w-md mx-auto relative" ref={searchRef}>
+                    <div className="relative">
+                        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#CCCCCC] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => { setSearch(e.target.value); setSearchOpen(true); }}
+                            onFocus={() => setSearchOpen(true)}
+                            placeholder="Search your products…"
+                            className="w-full bg-[#F4F4F4] border border-[#E5E5E5] rounded-md pl-8 pr-8 py-2 text-xs text-[#1A1A1A] placeholder-[#CCCCCC] outline-none focus:border-[#1A1A1A] transition-colors"
+                        />
+                        {search && (
+                            <button onClick={() => { setSearch(''); setSearchOpen(false); }} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#CCCCCC] hover:text-[#888]">
+                                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        )}
+                    </div>
+                    {searchOpen && filtered.length > 0 && (
+                        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 bg-white border border-[#E5E5E5] rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden">
+                            {filtered.map(p => (
+                                <button
+                                    key={p._id}
+                                    onMouseDown={() => { navigate(`/seller/products/${p._id}`); setSearch(''); setSearchOpen(false); }}
+                                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-[#F7F7F7] transition-colors text-left border-b border-[#F0F0F0] last:border-0"
+                                >
+                                    <div className="w-8 h-8 rounded-md overflow-hidden bg-[#F4F4F4] shrink-0 border border-[#E8E8E8]">
+                                        {p.images?.[0]?.url ? <img src={p.images[0].url} alt={p.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-[#EEEEEE]" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs font-medium text-[#1A1A1A] truncate">{p.title}</p>
+                                        <p className="text-[10px] text-[#888] font-semibold">{sym(p.price?.currency ?? 'INR')}{p.price?.amount?.toLocaleString()}</p>
+                                    </div>
+                                    <svg className="h-3 w-3 text-[#CCCCCC] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Dashboard link */}
+                <button
+                    onClick={() => navigate('/seller/Dashboard')}
+                    className="shrink-0 h-8 px-4 bg-[#1A1A1A] text-white text-[10px] font-bold tracking-[0.15em] uppercase hover:bg-black transition-colors hidden sm:flex items-center"
+                >
+                    Dashboard
+                </button>
             </nav>
 
             <main className="pt-16 px-8 xl:px-[40px] max-w-[1440px] mx-auto space-y-[80px]">
@@ -374,35 +444,90 @@ const SellerViewProduct = () => {
                             />
                         </div>
 
-                        {/* File Drag and Drop */}
-                        <div className="lg:col-span-4 mt-2">
-                            <label className="text-[12px] font-medium text-[#757575] tracking-[0.02em] mb-2 block">Upload Variant Images (Max 7, Optional)</label>
-                            <div 
-                                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                                onDragLeave={() => setIsDragging(false)}
-                                onDrop={handleDrop}
-                                className={`relative w-full border-2 border-dashed rounded-lg p-8 flex flex-col items-center justify-center transition-colors group ${isDragging ? 'border-[#1A1A1A] bg-[#F9F9F9]' : 'border-[#E5E5E5] bg-white hover:bg-[#F9F9F9]'}`}
-                            >
-                                <input 
-                                    type="file" 
-                                    multiple 
-                                    accept="image/*" 
-                                    onChange={handleImageSelect}
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                                />
-                                <CameraIcon />
-                                <p className="text-[14px] font-medium text-[#1A1A1A] mb-1">Drag & Drop images here</p>
-                                <p className="text-[12px] text-[#757575]">or click to browse files</p>
+                        {/* Image Upload — mirrors CreateProduct.jsx */}
+                        <div className="lg:col-span-4 mt-2 flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <label className="text-[12px] font-medium tracking-wide text-[#444748] uppercase">Images</label>
+                                <span className="text-[11px] text-[#A3A3A3]">{images.length} / {MAX_IMAGES}</span>
                             </div>
 
-                            {/* Dynamic Previews */}
-                            {previewUrls.length > 0 && (
-                                <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
-                                    {previewUrls.map((url, i) => (
-                                        <div key={i} className="w-16 h-16 shrink-0 rounded-md border border-[#E5E5E5] overflow-hidden">
-                                            <img src={url} alt="Preview" className="w-full h-full object-cover" />
+                            {/* Drop zone — visible while under limit */}
+                            {images.length < MAX_IMAGES && (
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    onDragOver={onDragOver}
+                                    onDragLeave={onDragLeave}
+                                    onDrop={onDrop}
+                                    className={`w-full rounded-md border-2 border-dashed py-10 px-6 text-center transition-colors ${
+                                        isDragging
+                                            ? 'border-[#1A1A1A] bg-[#F3F3F3]'
+                                            : 'border-[#E5E5E5] bg-white hover:border-[#C4C7C7] hover:bg-[#FAFAFA]'
+                                    }`}
+                                >
+                                    <div className="flex flex-col items-center gap-2 pointer-events-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-[#C4C7C7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                        <p className="text-sm text-[#444748] mt-1">
+                                            <span className="font-medium text-[#1A1A1A]">Click to upload</span>{' '}or drag &amp; drop
+                                        </p>
+                                        <p className="text-[11px] text-[#A3A3A3]">PNG, JPG, WEBP — up to {MAX_IMAGES} images</p>
+                                    </div>
+                                </button>
+                            )}
+
+                            {/* Hidden file input */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={handleFileChange}
+                                className="hidden"
+                            />
+
+                            {/* Preview grid */}
+                            {images.length > 0 && (
+                                <div className="grid grid-cols-4 gap-3 mt-1">
+                                    {images.map((img, i) => (
+                                        <div key={i} className="group relative aspect-square">
+                                            <img
+                                                src={img.preview}
+                                                alt={`upload-${i}`}
+                                                className="h-full w-full rounded-md object-cover border border-[#E5E5E5]"
+                                            />
+                                            {/* Cover badge */}
+                                            {i === 0 && (
+                                                <span className="absolute bottom-1.5 left-1.5 rounded-sm bg-white/85 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#1A1A1A] backdrop-blur-sm">
+                                                    Cover
+                                                </span>
+                                            )}
+                                            {/* Remove btn */}
+                                            <button
+                                                type="button"
+                                                onClick={() => removeImage(i)}
+                                                className="absolute top-1.5 right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm opacity-0 group-hover:opacity-100 transition-opacity text-[#757575] hover:text-[#ba1a1a]"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
                                         </div>
                                     ))}
+
+                                    {/* Add-more tile */}
+                                    {images.length < MAX_IMAGES && (
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="aspect-square rounded-md border border-dashed border-[#E5E5E5] bg-white flex items-center justify-center text-[#C4C7C7] hover:border-[#1A1A1A] hover:text-[#1A1A1A] transition-colors"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                            </svg>
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -457,8 +582,11 @@ const SellerViewProduct = () => {
                                                         <span className="text-[10px] text-[#757575] uppercase">No Img</span>
                                                     )}
                                                 </div>
-                                                <div className="p-2 flex flex-col items-center border-t border-[#E5E5E5] gap-1">
-                                                    <div className="flex flex-wrap items-center justify-center gap-1 text-center">
+                                                <div    className="p-2 flex flex-col items-center border-t border-[#E5E5E5] gap-1">
+                                                    <div onClick={() => {
+                                                    setActiveVariant(v);
+                                                    setCurrentImgIdx(0);
+                                                }} className="flex flex-wrap items-center justify-center gap-1 text-center">
                                                         {vSize && <span className="text-[11px] text-[#1A1A1A] font-medium uppercase">{vSize}</span>}
                                                         {vSize && vColor && <span className="text-[10px] text-[#E5E5E5]">|</span>}
                                                         {vColor && <span className="text-[11px] text-[#757575] font-medium capitalize">{vColor}</span>}

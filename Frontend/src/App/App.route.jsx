@@ -6,26 +6,19 @@ import Dashboard from "../features/products/pages/Dashboard";
 import Home from "../features/products/components/Home";
 import ViewProduct from "../features/products/components/ViewProduct";
 import Payment from "../features/products/pages/Payment";
-
-import Addtocart from "../features/products/components/Addtocart";
 import Protected from "../features/auth/components/Protected";
 import SellerViewProduct from "../features/products/components/SellerViewProduct";  
+import Cart from "../features/cart/pages/Cart";
+import AppLayout from "./AppLayout";
+import UserProfile from "../features/auth/pages/UserProfile";
+import SellerProfile from "../features/auth/pages/SellerProfile";
 const role ="seller"
 export const router=createBrowserRouter([{
     path:"/",
     element:<Home/>
 },
-{
-    path:"/ViewProduct/:ProductId",
-    element:<ViewProduct/>
-},
-{
-    path:"/cart/:cartId",
-    element:<Addtocart/>},
-{
-    path:"/payment",
-    element:<Payment/>
-},
+
+
 {path:"/register",
     element:<Register/>
 },
@@ -33,7 +26,32 @@ export const router=createBrowserRouter([{
     path:"/login",
     element:<Login/>
 },
+  {
+    path:"/Profile",
+    element:<UserProfile/>
+},
+{
+    element:<AppLayout/>,
+    children:[
+        {
+    path:"/ViewProduct/:ProductId",
+    element:<ViewProduct/>
+},
 
+{
+    path:"/cart",
+    element:<Cart/>},
+  
+{
+    path:"/payment",
+    element:<Payment/>
+},
+
+
+    ]
+    
+    
+},
 {    path:"/seller",
     children:[
         {
@@ -57,6 +75,10 @@ export const router=createBrowserRouter([{
             element:<Protected role="seller"> 
                 <SellerViewProduct/>
             </Protected>
+        },
+        {
+            path:"/seller/profile",
+            element:<Protected role="seller"><SellerProfile/></Protected>
         },
    
     ]

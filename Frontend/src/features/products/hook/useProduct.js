@@ -1,7 +1,7 @@
 import {useDispatch} from "react-redux"
 import { setError, setLoading } from "../../auth/state/authslice"
 import {AddVariants, Createproduct, GetallProduct, GetSellerProduct, ViewDetailProduct } from "../services/product.api"
-import { addToCart, Setallproduct, setProducts, SetViewProduct } from "../product.slice"
+import {  Setallproduct, setProducts, SetViewProduct } from "../product.slice"
 
 export  function useProduct(){
 
@@ -57,9 +57,6 @@ dispatch(setError(err.message))    }
      dispatch(setLoading(true))
     const data=await ViewDetailProduct(ProductId)
        
-       
-      dispatch(addToCart(data.product))
-
       dispatch(setLoading(false))
       return data
     

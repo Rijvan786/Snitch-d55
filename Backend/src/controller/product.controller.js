@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import ProductModel from "../models/product.model.js"
 import { uploadFile } from "../services/storage.service.js"
-import VariantModel from "../models/Variant.model.js";
+
 
 
 
@@ -105,7 +105,7 @@ export async  function  AddProductVariantController(req,res){
            const files=req.files;
            const images=[];
 
-           if(files || files.length !==0){
+           if(files || files.length   !==0){
 
              (await Promise.all(files.map(async(file)=>{
               const image=await uploadFile({
@@ -130,6 +130,7 @@ export async  function  AddProductVariantController(req,res){
               stock,
               attributes
            })
+           
            await product.save()
            return res.status(200).json({
             message:"Product Variant added Successfully",
@@ -137,3 +138,4 @@ export async  function  AddProductVariantController(req,res){
             product
            })
 }
+

@@ -12,7 +12,7 @@ export const uploadFile= async({buffer,fileName,folder="Snitch"})=>{
     
     const result=await client.files.upload({
         file:await ImageKit.toFile(Buffer.from(buffer)),
-        fileName,
+        fileName, 
         folder
     })
     return result
