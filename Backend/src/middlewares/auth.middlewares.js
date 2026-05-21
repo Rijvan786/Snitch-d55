@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
 import userModel from "../models/user.model.js"
+import { client } from "../config/cache.js"
 
 export   async  function  AuthenticateUser(req,res,next){
              const token=req.cookies.token
@@ -10,6 +11,13 @@ export   async  function  AuthenticateUser(req,res,next){
                })
              }
 
+
+             const blacklisted=await client.get(token)
+               if(blacklisted){
+                return res.status(400).json({
+                    message:"user is unAuthorized Because Token is Blacklisted"
+                })
+             }
              try {
                const encrypted=jwt.verify(token,config.JWT_SECRET)
                const user =await userModel.findById(encrypted.id)

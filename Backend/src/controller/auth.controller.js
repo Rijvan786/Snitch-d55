@@ -3,6 +3,7 @@ import userModel from "../models/user.model.js"
 import jwt from "jsonwebtoken"
 import { validatedAndFormat } from "../validator/contact.validator.js"
 import bcrypt from "bcryptjs"
+import { client } from "../config/cache.js"
  
 /***TOKEN sender function  */
 
@@ -148,6 +149,19 @@ console.log("okeoke",user);
         role:user.role
             }
         })
+    
+}
+
+export async function LogoutController(req,res) {
+
+    const token=req.cookies.token
+    res.clearCookie("token",token)
+
+    client.set(token,Date.now().toString(),"EX",60*60)
+
+    res.status(200).json({
+        message:"Logout Successfully"
+    })
     
 }
 

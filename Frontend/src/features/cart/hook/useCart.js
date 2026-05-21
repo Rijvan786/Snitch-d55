@@ -2,7 +2,7 @@ import { AddToItem, DecrementCartItemApi, DeleteCartItem, GetCart,  IncrementCar
 
 import { useDispatch } from "react-redux"
 
-import {  setItems,incrementCartItem, decrementCartItem, DeleteCartItemsLive } from "../state/cart.slice.jsx";
+import {  setItems,incrementCartItem, decrementCartItem, DeleteCartItemsLive, setCart, setTotalPrice } from "../state/cart.slice.jsx";
 import { setError, setLoading } from "../../auth/state/authslice.jsx";
 
 
@@ -32,8 +32,14 @@ export function useCart(){
                  const data=await GetCart()
                ;
                  // data IS the cart object: { _id, user, items, __v }
-                dispatch(setItems(data.cart.items))
-                console.log(data);
+                dispatch(setCart(data.cart))
+                console.log(data.cart);
+             
+                
+              
+             
+                
+             
         } catch (error) {
            dispatch(setError(error.message)  )
         } 
@@ -46,6 +52,7 @@ export function useCart(){
         
        const data=await IncrementCartItemApi({productId,variantId,quantity,price})
        dispatch(incrementCartItem({productId,variantId}))
+        
    }
 
      async function handleDecrementCartItem({productId,variantId,quantity,price}){
@@ -54,7 +61,8 @@ export function useCart(){
        const data=await DecrementCartItemApi({productId,variantId,quantity,price})
        
        dispatch(decrementCartItem({productId,variantId}))
-   }
+         
+}
    async function handleDeleteCartItem({productId,variantId}) {
              const data=await DeleteCartItem({productId,variantId})
               dispatch(DeleteCartItemsLive({productId,variantId}))

@@ -2,20 +2,25 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { useCart } from '../hook/useCart.js';
-import { useProduct } from '../../products/hook/useProduct';
+import { useRazorpay } from "react-razorpay";
 
 /* ── helpers ─────────────────────────────────────── */
 const sym = (c) => ({ INR: '₹', USD: '$', EUR: '€', GBP: '£' }[c] ?? c);
 
 const Cart = () => {
   const { handleGetItems, handleIncrementCartItem, handleDecrementCartItem, handleDeleteCartItem } = useCart();
-  const { handleGETallProduct } = useProduct();
+
   const navigate = useNavigate();
+  const { error, isLoading, Razorpay } = useRazorpay();
+  
 
   const user = useSelector((state) => state.auth?.User);
-  const cartItems = useSelector((state) => state.cart.items) ?? [];
-  console.log(cartItems);
-  const allProducts = useSelector((state) => state.product.allProduct) ?? [];
+  const cart = useSelector((state) => state.cart.items) ?? [];
+  
+  const TotalPrice = useSelector((state) => state.cart.TotalPrice) ?? [];
+ 
+  console.log(cart);
+ console.log(TotalPrice);
 
   // Search State
   const [search, setSearch] = useState('');
@@ -40,16 +45,15 @@ const Cart = () => {
       return () => clearTimeout(timer);
     }
   }, [showToast]);
-
-  const SubTotal = cartItems.reduce((acc, item) => acc + (item?.price?.amount ?? 0), 0);
-  const shipping = cartItems.length > 0 ? 50 : 0;
-  const total = SubTotal + shipping;
+  const SubTotal = TotalPrice
+  const shipping = cart?.length > 0 ? 50 : 0;
+  const total = TotalPrice + shipping;
 
   const filtered = useMemo(() =>
-    search.trim() === '' ? [] : allProducts.filter(p =>
+    search.trim() === '' ? [] : cart?.filter(p =>
       p.title?.toLowerCase().includes(search.toLowerCase())
     ).slice(0, 6)
-  , [search, allProducts]);
+  , [search,cart.item]);
 
   async function IncrementQuantityCartItem({ productId, variantId, quantity, price, title, image }) {
     await handleIncrementCartItem({ productId, variantId, quantity, price });
@@ -65,10 +69,12 @@ const Cart = () => {
     await handleDeleteCartItem({ productId, variantId });
     triggerToast('Removed from Cart', title, image, 'error');
   }
-
+async function getCartItems() {
+  await handleGetItems()
+}
   useEffect(() => {
-    handleGetItems();
-    handleGETallProduct();
+ getCartItems()
+  
   }, []);
 
   useEffect(() => {
@@ -78,6 +84,31 @@ const Cart = () => {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+  const handlePayment = () => {
+    const options = {
+      key: "rzp_test_Ss1tIjXWVEufIL",
+      amount: 50000, // Amount in paise
+      currency: "INR",
+      name: "Test Company",
+      description: "Test Transaction",
+      order_id: "order_9A33XWu170gUtm", // Generate order_id on server
+      handler: (response) => {
+        console.log(response);
+        alert("Payment Successful!");
+      },
+      prefill: {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#F37254",
+      },
+    };
+
+    const razorpayInstance = new Razorpay(options);
+    razorpayInstance.open();
+  };
 
   return (
     <div className="min-h-screen bg-[#141313] font-[Inter,sans-serif] text-[#e5e2e1] selection:bg-[#F5C518] selection:text-black">
@@ -162,7 +193,7 @@ const Cart = () => {
       </header>
 
       {/* ── Main Layout ── */}
-      {cartItems.length === 0 ? (
+      {cart?.length === 0 ? (
         /* Empty State */
         <div className="flex-1 flex flex-col items-center justify-center gap-8 py-32">
           <div className="text-center">
@@ -185,7 +216,7 @@ const Cart = () => {
           {/* Title row */}
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-2 text-white">Your Bag</h1>
           <p className="text-[10px] text-[#8e9192] tracking-[0.2em] uppercase mb-16 font-semibold">
-            {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} · Ready for checkout
+            {cart?.length} {cart?.length === 1 ? 'item' : 'items'} · Ready for checkout
           </p>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
@@ -202,24 +233,20 @@ const Cart = () => {
 
               {/* Rows */}
               <div className="divide-y divide-[#444748]/30">
-                {cartItems.map((item) => {
-                  const variantObj = item.product?.variants?.find(
-                    (v) => v._id === item.variants
-                  ) ?? null;
-
-                  const displayImg = item.product?.images?.[0]?.url
-                    || item.product?.images?.[0]
+                {cart?.map((item) => {
+                  console.log(item.product);
+                 
+                 
+         
+                  const displayImg = item?.product?.images?.[0]?.url
+                    || item.product?.images?.[0]?.url
                     || 'https://via.placeholder.com/300x400?text=No+Image';
 
-                  const attributes = variantObj?.attributes
-                    && Object.keys(variantObj.attributes).length > 0
-                    ? Object.entries(variantObj.attributes)
-                    : null;
+                  
 
-                  const variantPrice = variantObj?.price?.amount
-                    ? variantObj.price
-                    : item?.price;
-                      
+                   const variantPrice=item?.product?.variants?.price
+                   const productPrice=item?.product?.price
+
                   return (
                     <div key={item._id} className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center py-8 group">
                       
@@ -250,18 +277,9 @@ const Cart = () => {
 
                             {/* Attributes chips */}
                             <div className="flex flex-wrap gap-1.5 mb-3">
-                              {attributes ? (
-                                attributes.map(([key, val]) => (
-                                  <span key={key} className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider border border-[#444748] px-2 py-0.5 text-zinc-400">
-                                    <span>{key}:</span>
-                                    <span className="text-[#F5C518]">{val}</span>
-                                  </span>
-                                ))
-                              ) : (
-                                <span className="text-[9px] font-bold uppercase tracking-wider border border-[#444748]/30 px-2 py-0.5 text-zinc-500">
+  <span className="text-[9px] font-bold uppercase tracking-wider border border-[#444748]/30 px-2 py-0.5 text-zinc-500">
                                   Base
                                 </span>
-                              )}
                             </div>
 
                             <p className="text-xs font-semibold text-zinc-400">
@@ -272,7 +290,7 @@ const Cart = () => {
                           {/* Stock Status */}
                           <div className="mt-2.5">
                             {(() => {
-                              const itemStock = variantObj ? (variantObj.stock ?? 0) : (item.product?.stock ?? 0);
+                              const itemStock = item.product.variants.stock ? (item.product.variants.stock ?? 0) : (item.product?.stock ?? 0);
                               return itemStock > 0 ? (
                                 <span className="text-[9px] font-bold uppercase tracking-wider text-white-500 bg-green-500/10 border border-green-500/20 px-2 py-0.5">
                                   In Stock: {itemStock}
@@ -286,11 +304,11 @@ const Cart = () => {
                             })()}
                            
                           </div>
-                           <span>{item.price.amount!==variantPrice.amount &&(
+                           <span>{productPrice?.amount!==variantPrice?.amount &&(
                             <>{
-                              item.price.amount>variantPrice.amount?
-                              <p className='text-green-500 text-sm'>yous will gate this at   {sym(item?.price?.currency),variantPrice.amount}. save {(item.price.amount-variantPrice.amount)} </p>:
-                              <p className='text-red-500 text-sm'>Warning this product will cost you   {variantPrice.amount-item.price.amount} more </p>
+                              productPrice?.amount>variantPrice?.amount?
+                              <p className='text-green-500 text-sm'>yous will gate this at   {sym(productPrice?.currency),variantPrice.amount}. save {(productPrice?.amount-variantPrice.amount)} </p>:
+                              <p className='text-red-500 text-sm'>Warning this product will cost you   {variantPrice.amount-productPrice?.amount} more </p>
                             }</> 
                            )}</span>
                           <button
@@ -316,7 +334,7 @@ const Cart = () => {
                                 title: item.product?.title,
                                 image: displayImg
                               });
-                            }}
+                                                          }}
                             className="w-9 h-9 flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors text-base"
                           >
                             −
@@ -325,7 +343,7 @@ const Cart = () => {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() =>
+                            onClick={() =>{
                               IncrementQuantityCartItem({
                                 productId: item.product._id,
                                 variantId: item.variants,
@@ -333,8 +351,10 @@ const Cart = () => {
                                 price: (item?.price?.amount) / item.quantity,
                                 title: item.product?.title,
                                 image: displayImg
-                              })
-                            }
+                              });
+                             
+                              
+                            }}
                             className="w-9 h-9 flex items-center justify-center text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors text-base"
                           >
                             +
@@ -345,7 +365,7 @@ const Cart = () => {
                       {/* Total */}
                       <div className="md:col-span-3 flex md:justify-end items-center">
                         <span className="text-base font-bold text-white tracking-tight">
-                          {sym(item?.price?.currency)}{item?.price?.amount}
+                          {sym(item?.price?.currency)}{item?.price?.amount} 
                         </span>
                       </div>
                     </div>
@@ -375,20 +395,16 @@ const Cart = () => {
 
                 {/* Summarized item list */}
                 <div className="space-y-4 mb-8">
-                  {cartItems.map((item) => {
-                    const variantObj = item.product?.variants?.find(
-                      (v) => v._id === item.variants
-                    ) ?? null;
-                    const attrs = variantObj?.attributes;
-                    const label = attrs ? Object.values(attrs).join(' · ') : 'Base';
+                  {cart?.map((item) => {
+                  
                     return (
                       <div key={item._id} className="flex justify-between gap-3 text-xs">
                         <div className="flex-1 min-w-0">
                           <p className="text-zinc-300 font-bold uppercase truncate">{item.product?.title}</p>
-                          <p className="text-[10px] text-zinc-500 font-semibold mt-0.5 uppercase tracking-wider">{label} · ×{item.quantity}</p>
+                          <p className="text-[10px] text-zinc-500 font-semibold mt-0.5 uppercase tracking-wider">Base · ×{item.quantity} L</p>
                         </div>
                         <span className="text-zinc-300 font-bold shrink-0">
-                          {sym(item?.price?.currency)}{item?.price?.amount}
+                          {sym(item?.price?.currency)}{item?.price?.amount} 
                         </span>
                       </div>
                     );
@@ -421,7 +437,7 @@ const Cart = () => {
                     if (!user) {
                       navigate('/register');
                     } else {
-                      navigate('/payment');
+                      handlePayment()
                     }
                   }}
                   className="w-full bg-[#F5C518] text-black py-5 text-[11px] font-black tracking-[0.2em] uppercase hover:bg-white transition-colors duration-300 rounded-none mb-4 active:scale-[0.98]"

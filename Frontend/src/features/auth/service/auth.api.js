@@ -30,7 +30,7 @@ export  async function getMe(){
 }
 
 export async function Logout(){
-    const response = await api.post("/logout")
+    const response = await api.get("/logout")
     return response.data
 }
 

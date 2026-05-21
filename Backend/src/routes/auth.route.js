@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { registerValidation } from "../validator/auth.validator.js";
-import { GetmeController, GoogleCallback, LoginController, RegisterController } from "../controller/auth.controller.js";
+import { GetmeController, GoogleCallback, LoginController, LogoutController, RegisterController } from "../controller/auth.controller.js";
 import passport from "passport";
 import { config } from "../config/config.js";
 import { AuthenticateUser } from "../middlewares/auth.middlewares.js";
@@ -25,6 +25,7 @@ router.get("/google/callback",passport.authenticate('google',{session:false,fail
 
 router.get("/getme",AuthenticateUser,GetmeController)
 
+router.get("/logout",AuthenticateUser,LogoutController)
 
 
 export default router

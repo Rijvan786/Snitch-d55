@@ -26,11 +26,16 @@ if(!process.env.IMAGEKIT_API_KEY){
 
 }
 
+
+
 export const config={
     MONGO_URI:process.env.MONGO_URI,
     JWT_SECRET:process.env.JWT_SECRET,
     GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET:process.env.GOOGLE_CLIENT_SECRET,
     NODE_ENV:process.env.NODE_ENV || "development",
-    IMAGEKIT_API_KEY:process.env.IMAGEKIT_API_KEY
+    IMAGEKIT_API_KEY:process.env.IMAGEKIT_API_KEY,
+    REDIS_HOST:process.env.REDIS_HOST,
+    REDIS_PORT:process.env.REDIS_PORT,
+    REDIS_PASSWORD:process.env.REDIS_PASSWORD
 }

@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import { stockOfVariant } from "../dao/product.dao.js"
 import CartModel from "../models/Cart.model.js"
 import priceSchema from "../models/price.model.js"
@@ -82,7 +83,62 @@ export async function AddTOCartController(req,res){
 export async function  getCartController(req,res){
     const user=req.user
 
-    let  cart =await CartModel.findOne({user:user._id}).populate("items.product")
+    let  cart =(await CartModel.aggregate(
+  [
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(user._id)
+      }
+    },
+    { $unwind: { path: '$items' } },
+    {
+      $lookup: {
+        from: 'products',
+        localField: 'items.product',
+        foreignField: '_id',
+        as: 'items.product'
+      }
+    },
+    { $unwind: { path: '$items.product' } },
+    {
+      $unwind: { path: '$items.product.variants' }
+    },
+    {
+      $match: {
+        $expr: {
+          $eq: [
+            '$items.variants',
+            '$items.product.variants._id'
+          ]
+        }
+      }
+    },
+    {
+      $addFields: {
+        itemPrice: {
+          price: {
+            $multiply: [
+              '$items.quantity',
+              '$items.product.variants.price.amount'
+            ]
+          },
+          currency:
+            '$items.product.variants.price.currency'
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$_id',
+        totalPrice: { $sum: '$itemPrice.price' },
+        currency: {
+          $first: '$items.price.currency'
+        },
+        items: { $push: '$items' }
+      }
+    }
+  ],
+  ))[ 0 ]
 
 
     if(!cart){
