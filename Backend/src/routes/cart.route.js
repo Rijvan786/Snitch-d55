@@ -5,7 +5,10 @@ import { AddTOCartController,
      DecrementCartItemQuantityController,
      DeleteCartController,
      getCartController, 
-     IncrementCartItemQuantityController} from "../controller/cart.controller.js"
+     IncrementCartItemQuantityController,
+    createOrderController,
+    verifyOrderController
+    } from "../controller/cart.controller.js"
 
 
 const router=Router()
@@ -23,4 +26,7 @@ router.patch("/quantity/decrement/:productId/:variantId",
 
 router.patch("/Delete/:productId/:variantId",AuthenticateUser,validateIncrementCartItemQuantity,DeleteCartController)
 
+router.post("/payment/create/order",AuthenticateUser,createOrderController )
+
+router.post("/payment/verify/order",AuthenticateUser,verifyOrderController)
 export default router   

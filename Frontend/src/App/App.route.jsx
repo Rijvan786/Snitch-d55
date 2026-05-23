@@ -12,6 +12,7 @@ import Cart from "../features/cart/pages/Cart";
 import AppLayout from "./AppLayout";
 import UserProfile from "../features/auth/pages/UserProfile";
 import SellerProfile from "../features/auth/pages/SellerProfile";
+import OrderSuccess from "../features/cart/pages/OrderSuccess";
 const role ="seller"
 export const router=createBrowserRouter([{
     path:"/",
@@ -43,8 +44,8 @@ export const router=createBrowserRouter([{
     element:<Cart/>},
   
 {
-    path:"/payment",
-    element:<Payment/>
+    path:"/order-success",
+    element:<OrderSuccess/>
 },
 
 

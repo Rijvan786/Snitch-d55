@@ -26,6 +26,14 @@ if(!process.env.IMAGEKIT_API_KEY){
 
 }
 
+if(!process.env.RAZORPAY_KEY_ID){
+    throw new Error("RAZORPAY_KEY_ID  is not defined environment variables")
+}
+
+if(!process.env.RAZORPAY_KEY_SECRET){
+     throw new Error("RAZORPAY_KEY_SECRET  is not defined environment variables")
+}
+    
 
 
 export const config={
@@ -37,5 +45,7 @@ export const config={
     IMAGEKIT_API_KEY:process.env.IMAGEKIT_API_KEY,
     REDIS_HOST:process.env.REDIS_HOST,
     REDIS_PORT:process.env.REDIS_PORT,
-    REDIS_PASSWORD:process.env.REDIS_PASSWORD
+    REDIS_PASSWORD:process.env.REDIS_PASSWORD,
+    RAZORPAY_KEY_ID:process.env.RAZORPAY_KEY_ID,
+    RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET
 }

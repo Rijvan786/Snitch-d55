@@ -1,8 +1,8 @@
-import { AddToItem, DecrementCartItemApi, DeleteCartItem, GetCart,  IncrementCartItemApi} from "../services/cart.api.js";
+import { AddToItem, createCartOrder, DecrementCartItemApi, DeleteCartItem, GetCart,  IncrementCartItemApi, verifyCartOrder} from "../services/cart.api.js";
 
 import { useDispatch } from "react-redux"
 
-import {  setItems,incrementCartItem, decrementCartItem, DeleteCartItemsLive, setCart, setTotalPrice } from "../state/cart.slice.jsx";
+import {  setItems,incrementCartItem, decrementCartItem, DeleteCartItemsLive, setCart,} from "../state/cart.slice.jsx";
 import { setError, setLoading } from "../../auth/state/authslice.jsx";
 
 
@@ -30,10 +30,12 @@ export function useCart(){
         try {
                  dispatch(setLoading(true))
                  const data=await GetCart()
+                 console.log(data);
+
+                 dispatch(setCart(data.cart))
                ;
                  // data IS the cart object: { _id, user, items, __v }
-                dispatch(setCart(data.cart))
-                console.log(data.cart);
+                
              
                 
               
@@ -63,14 +65,39 @@ export function useCart(){
        dispatch(decrementCartItem({productId,variantId}))
          
 }
+
    async function handleDeleteCartItem({productId,variantId}) {
              const data=await DeleteCartItem({productId,variantId})
               dispatch(DeleteCartItemsLive({productId,variantId}))
              return data
    }
+
+   async function handleCreateCartOrder() {
+    const data=await createCartOrder()
+    return data.order
+   }
+
+   async function handleVerifyCartOrder({ razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature}) {
+        console.log(razorpay_order_id,razorpay_payment_id,razorpay_signature);
+    const data=await verifyCartOrder({ razorpay_order_id,
+    razorpay_payment_id,
+    razorpay_signature,
+})
+return data.success
+    
+   }
    
 
-    return {handleAddItem,handleGetItems,handleIncrementCartItem,handleDecrementCartItem,handleDeleteCartItem}
+    return {handleAddItem,
+        handleGetItems,
+        handleIncrementCartItem,
+        handleDecrementCartItem,
+        handleDeleteCartItem,
+        handleCreateCartOrder,
+        handleVerifyCartOrder
+    }
 }
 
 ;

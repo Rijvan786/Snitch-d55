@@ -138,7 +138,6 @@ export async function GetmeController(req,res){
     
    
 
-console.log("okeoke",user);
         res.status(200).json({
             message:"Fetch user is successfully",
         user:{

@@ -8,7 +8,13 @@ import { useRazorpay } from "react-razorpay";
 const sym = (c) => ({ INR: '₹', USD: '$', EUR: '€', GBP: '£' }[c] ?? c);
 
 const Cart = () => {
-  const { handleGetItems, handleIncrementCartItem, handleDecrementCartItem, handleDeleteCartItem } = useCart();
+  const { handleGetItems,
+     handleIncrementCartItem,
+     handleDecrementCartItem,
+     handleDeleteCartItem,
+     handleCreateCartOrder,
+     handleVerifyCartOrder
+   } = useCart();
 
   const navigate = useNavigate();
   const { error, isLoading, Razorpay } = useRazorpay();
@@ -84,22 +90,28 @@ async function getCartItems() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-  const handlePayment = () => {
-    const options = {
-      key: "rzp_test_Ss1tIjXWVEufIL",
-      amount: 50000, // Amount in paise
-      currency: "INR",
-      name: "Test Company",
+
+async function handleCheckout() {
+  try{const order=await handleCreateCartOrder()
+  console.log(order,"Ordrer");
+  const options = {
+      key: "rzp_test_SsTkF9Jl3hasGQ",
+      amount: order.amount, // Amount in paise
+      currency: order.currency,
+      name: "Snitch",
       description: "Test Transaction",
-      order_id: "order_9A33XWu170gUtm", // Generate order_id on server
-      handler: (response) => {
-        console.log(response);
-        alert("Payment Successful!");
+      order_id: order.id, // Generate order_id on server
+      handler: async(response) => {
+          const isValid=await handleVerifyCartOrder(response)
+          console.log(isValid,"Success");
+          if(isValid){
+            navigate(`/order-success?order_id=${response.razorpay_order_id}`)
+          }
       },
       prefill: {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        contact: "9999999999",
+        name: user.fullname,
+        email: user.email,
+        contact: user.contact,
       },
       theme: {
         color: "#F37254",
@@ -108,7 +120,16 @@ async function getCartItems() {
 
     const razorpayInstance = new Razorpay(options);
     razorpayInstance.open();
-  };
+}
+catch(err){
+  console.log(err);
+}
+
+
+}
+  
+
+
 
   return (
     <div className="min-h-screen bg-[#141313] font-[Inter,sans-serif] text-[#e5e2e1] selection:bg-[#F5C518] selection:text-black">
@@ -437,7 +458,7 @@ async function getCartItems() {
                     if (!user) {
                       navigate('/register');
                     } else {
-                      handlePayment()
+                      handleCheckout()
                     }
                   }}
                   className="w-full bg-[#F5C518] text-black py-5 text-[11px] font-black tracking-[0.2em] uppercase hover:bg-white transition-colors duration-300 rounded-none mb-4 active:scale-[0.98]"
