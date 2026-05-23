@@ -90,6 +90,7 @@ async function getCartItems() {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+<<<<<<< HEAD
 
 async function handleCheckout() {
   try{const order=await handleCreateCartOrder()
@@ -99,6 +100,14 @@ async function handleCheckout() {
       amount: order.amount, // Amount in paise
       currency: order.currency,
       name: "Snitch",
+=======
+  const handlePayment = () => {
+    const options = {
+      key: "TTTTTTTT",
+      amount: 50000, // Amount in paise
+      currency: "INR",
+      name: "Test Company",
+>>>>>>> 638bc51ebb8599ce4b742c105ee720df0c502369
       description: "Test Transaction",
       order_id: order.id, // Generate order_id on server
       handler: async(response) => {
