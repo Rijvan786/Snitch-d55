@@ -1,5 +1,9 @@
 import  app from "./src/app.js"; 
 import  connectDB from './src/config/database.js';
+import userModel from "./src/models/user.model.js";
+
+
+
 
 
 
@@ -12,6 +16,7 @@ app.get('/', (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
+   
     app.listen(PORT, () => {
       console.log(`Server listening on port ${PORT}`);
     });
@@ -19,6 +24,8 @@ const startServer = async () => {
     console.error('Failed to start server:', error.message);
     process.exit(1);
   }
+   const user=await userModel.findOne({});
+    console.log(user);
 };
 
 startServer();

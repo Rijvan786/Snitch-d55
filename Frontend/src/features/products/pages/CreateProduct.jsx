@@ -1,6 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react"; 
 import { useProduct } from "../hook/useProduct.js";
 import { CreateProductSkeleton } from "../../../App/Skeleton.jsx"; 
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 
 /* ─────────────────────────────────────────────────────────────────────────
    Stitch design reference: Editorial Minimalist — Inter, neutral palette,
@@ -13,7 +15,6 @@ const NAV_LINKS = [
   { label: "Orders",      icon: OrdersIcon      },
   { label: "Analytics",   icon: AnalyticsIcon   },
 ];
-
 const CURRENCIES = ["INR", "USD", "EUR", "GBP"];
 const MAX_IMAGES = 7;
 
@@ -131,6 +132,12 @@ const inputCls =
 export const 
 CreateProduct = () => {
   const { handleCreateProduct } = useProduct();
+   const user=useSelector(s=>s.auth.user)
+   const navigate = useNavigate();
+
+    if(!user){
+      navigate("/")
+    }
 
   /* ── consolidated form state ── */
   const [formData, setFormData] = useState({

@@ -35,7 +35,23 @@ const userSchema=new mongoose.Schema({
     },
     googleId:{
         type:String
-    }
+    },
+    verified:{
+        type:Boolean,
+        default:false
+    },
+    lastVerificationEmailSent:{
+        type:Date,
+        default:null
+    },
+   VerificationEmailResendEmailCount:{
+    type:Number,
+    default:0
+   }
+
+   
+},{
+    timestamps:true
 })
 
 userSchema.pre("save",async function(){
@@ -52,6 +68,6 @@ userSchema.methods.comparePassword=async function(password){
 
 
 
-const userModel=mongoose.model("user",userSchema)
+const   userModel=mongoose.model("user",userSchema)
 
 export default userModel

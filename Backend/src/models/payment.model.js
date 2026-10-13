@@ -1,7 +1,7 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import priceSchema from "./price.model.js";
 
-const paymentSchema=new mongoose.Schema({
+const PaymentSchema=new mongoose.Schema({
     status:{
         type:String,
         enum:["pending","paid","failed"],
@@ -9,35 +9,37 @@ const paymentSchema=new mongoose.Schema({
     },
     price:{
         type:priceSchema,
-        require:true
+        required:true
     },
+    
     razorpay:{
         orderId:String,
         paymentId:String,
-        signature:String
-    },
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"user",
-        required:true
-    },
+        signature:String,
+     },
+     user:{
+          type:mongoose.Schema.Types.ObjectId,
+          ref:"user"
+     },
 
-    orderItems:[
-        {
-            title:String,
-            productId:mongoose.Schema.Types.ObjectId,
-            variantId:mongoose.Schema.Types.ObjectId,
-            quantity:Number,
-            images:[{url:String}],
-            description:String,
-            price:priceSchema
-        }
-    ]
+     orderItems:[
+  {   title:String,
+     productId:mongoose.Schema.Types.ObjectId,
+     variantId:mongoose.Schema.Types.ObjectId,
+     description:String,
+     price:priceSchema,
+     quantity:Number,
+     images:[{url:String}],
+ }
+
+     ]
+    
 },
+
 {timestamps:true}
 )
 
 
-const paymentModel=mongoose.model("payment",paymentSchema)
+const PaymentModel=mongoose.model("payment",PaymentSchema)
 
-export default paymentModel
+export default PaymentModel

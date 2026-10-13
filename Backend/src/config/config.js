@@ -1,51 +1,96 @@
 import dotenv  from "dotenv";
 dotenv.config()
 
-if(!process.env.MONGO_URI){
+
+const {MONGO_URI,JWT_SECRET,NODE_ENV,PORT,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REFRESH_TOKEN,GOOGLE_CLIENT_ID2,GOOGLE_CLIENT_SECRET2,EMAIL_USER,EMAIL_PASSWORD,
+IMAGE_KIT_API_KEY,RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET} =process.env
+
+if(!MONGO_URI){
     throw new Error("Mongo_URI is not defined in environment variables")
 }
 
-if(!process.env.JWT_SECRET){
+if(!JWT_SECRET){
     throw new Error("JWT_SECRET is not defined in environment variables")
 
 }
-
-if(!process.env.GOOGLE_CLIENT_ID){
-    throw new Error("GOOGLE_CLIENT_ID is not defined environment variables")
-}
-if(!process.env.GOOGLE_CLIENT_SECRET){
-    throw new Error("GOOGLE_CLIENT_SECRET is not defined environment variables")
-
-}
-if(!process.env.NODE_ENV){
+if(!NODE_ENV){
     throw new Error("NODE_ENV is not defined environment variables")
 
 }
-if(!process.env.IMAGEKIT_API_KEY){
+
+if(!PORT){
+    throw new Error("PORT is not defined environment variables")
+
+}
+
+
+if(!GOOGLE_CLIENT_ID){
+    throw new Error("GOOGLE_CLIENT_ID is not defined environment variables")
+}
+if(!GOOGLE_CLIENT_SECRET){
+    throw new Error("GOOGLE_CLIENT_SECRET is not defined environment variables")
+
+}
+
+if(!GOOGLE_REFRESH_TOKEN){
+    throw new Error("GOOGLE_REFRESH_TOKEN is not defined environment variables")
+
+}
+
+if(!GOOGLE_CLIENT_ID2){
+    throw new Error("GOOGLE_CLIENT_ID2 is not defined environment variables")
+
+}
+
+if(!GOOGLE_CLIENT_SECRET2){
+    throw new Error("GOOGLE_CLIENT_SECRET2 is not defined environment variables")
+}
+
+if(!EMAIL_USER){
+    throw new Error("EMAIL_USER is not defined environment variables")
+
+}
+if(!EMAIL_PASSWORD){
+    throw new Error("EMAIL_PASSWORD is not defined environment variables")
+}
+if(!IMAGE_KIT_API_KEY){
     throw new Error("IMAGEKIT_API_KEY is not defined environment variables")
 
 }
 
-if(!process.env.RAZORPAY_KEY_ID){
+if(!RAZORPAY_KEY_ID){
     throw new Error("RAZORPAY_KEY_ID  is not defined environment variables")
 }
 
-if(!process.env.RAZORPAY_KEY_SECRET){
+if(!RAZORPAY_KEY_SECRET){
      throw new Error("RAZORPAY_KEY_SECRET  is not defined environment variables")
 }
     
 
 
 export const config={
-    MONGO_URI:process.env.MONGO_URI,
-    JWT_SECRET:process.env.JWT_SECRET,
-    GOOGLE_CLIENT_ID:process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET:process.env.GOOGLE_CLIENT_SECRET,
-    NODE_ENV:process.env.NODE_ENV || "development",
-    IMAGEKIT_API_KEY:process.env.IMAGEKIT_API_KEY,
-    REDIS_HOST:process.env.REDIS_HOST,
-    REDIS_PORT:process.env.REDIS_PORT,
-    REDIS_PASSWORD:process.env.REDIS_PASSWORD,
-    RAZORPAY_KEY_ID:process.env.RAZORPAY_KEY_ID,
-    RAZORPAY_KEY_SECRET:process.env.RAZORPAY_KEY_SECRET
+    MONGO_URI:MONGO_URI,
+    
+    JWT_SECRET:JWT_SECRET,
+    
+    GOOGLE_CLIENT_ID:GOOGLE_CLIENT_ID,
+    
+    GOOGLE_CLIENT_SECRET:GOOGLE_CLIENT_SECRET,
+    
+    GOOGLE_CLIENT_ID2:GOOGLE_CLIENT_ID2,
+    
+    GOOGLE_CLIENT_SECRET2:GOOGLE_CLIENT_SECRET2,
+    
+    NODE_ENV:NODE_ENV || "development",
+    
+    IMAGE_KIT_API_KEY:IMAGE_KIT_API_KEY,
+    
+    EMAIL_USER:EMAIL_USER,
+    
+    EMAIL_PASSWORD:EMAIL_PASSWORD,
+    
+    RAZORPAY_KEY_ID:RAZORPAY_KEY_ID,
+    
+    RAZORPAY_KEY_SECRET:RAZORPAY_KEY_SECRET
+    
 }

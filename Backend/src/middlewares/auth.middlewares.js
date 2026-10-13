@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken"
 import { config } from "../config/config.js"
 import userModel from "../models/user.model.js"
-import { client } from "../config/cache.js"
+import BlackListModel from "../models/BlackList.model.js"
+// import { client } from "../config/cache.js"
 
 export   async  function  AuthenticateUser(req,res,next){
              const token=req.cookies.token
@@ -11,8 +12,10 @@ export   async  function  AuthenticateUser(req,res,next){
                })
              }
 
-
-             const blacklisted=await client.get(token)
+            // Redis is stop server is not working so i have commented the code for now
+             const blacklisted=await BlackListModel.findOne({
+               token:token
+             })
                if(blacklisted){
                 return res.status(400).json({
                     message:"user is unAuthorized Because Token is Blacklisted"

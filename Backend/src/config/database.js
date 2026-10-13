@@ -11,6 +11,7 @@ const connectDB = async () => {
   }
 
   await mongoose.connect(config.MONGO_URI);
+  
 
   console.log('Connected to MongoDB');
 };

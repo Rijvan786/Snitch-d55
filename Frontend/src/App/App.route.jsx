@@ -12,8 +12,13 @@ import Cart from "../features/cart/pages/Cart";
 import AppLayout from "./AppLayout";
 import UserProfile from "../features/auth/pages/UserProfile";
 import SellerProfile from "../features/auth/pages/SellerProfile";
-import OrderSuccess from "../features/cart/pages/OrderSuccess";
-const role ="seller"
+import OrderSuccess from "../features/cart/pages/Order-success";
+import Forgetmail from "../features/auth/pages/Forgetmail";
+import ForgetPassword from "../features/auth/pages/ForgetPassword";
+import Resend_Verify_Mail from "../features/auth/pages/Resend_Verify_Mail";
+
+
+
 export const router=createBrowserRouter([{
     path:"/",
     element:<Home/>
@@ -26,6 +31,18 @@ export const router=createBrowserRouter([{
 { 
     path:"/login",
     element:<Login/>
+},
+{
+    path:"/forgot-password",
+    element:<Forgetmail/>
+},
+{
+    path:"/forget-password",
+    element:<ForgetPassword/>
+},
+{
+    path:"/resend-verify-mail",
+    element:<Resend_Verify_Mail/>
 },
   {
     path:"/Profile",
@@ -43,11 +60,13 @@ export const router=createBrowserRouter([{
     path:"/cart",
     element:<Cart/>},
   
-{
-    path:"/order-success",
-    element:<OrderSuccess/>
-},
-
+   {path:"/order-success",
+      element:<OrderSuccess/>
+   },
+   {
+    path:"/Payment",
+    element:<Payment/>
+   }
 
     ]
     

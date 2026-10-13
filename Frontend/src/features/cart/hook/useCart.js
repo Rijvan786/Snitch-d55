@@ -1,9 +1,10 @@
-import { AddToItem, createCartOrder, DecrementCartItemApi, DeleteCartItem, GetCart,  IncrementCartItemApi, verifyCartOrder} from "../services/cart.api.js";
+import { AddToItem, CreateCartOrder, DecrementCartItemApi, DeleteCartItem, GetCart,  IncrementCartItemApi, VerifyCartOrder    } from "../services/cart.api.js";
 
 import { useDispatch } from "react-redux"
 
 import {  setItems,incrementCartItem, decrementCartItem, DeleteCartItemsLive, setCart,} from "../state/cart.slice.jsx";
 import { setError, setLoading } from "../../auth/state/authslice.jsx";
+
 
 
 export function useCart(){
@@ -71,24 +72,20 @@ export function useCart(){
               dispatch(DeleteCartItemsLive({productId,variantId}))
              return data
    }
+   async function handleCreateCartOrder(){
 
-   async function handleCreateCartOrder() {
-    const data=await createCartOrder()
+    const data=await CreateCartOrder()
+
     return data.order
-   }
-
-   async function handleVerifyCartOrder({ razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature}) {
-        console.log(razorpay_order_id,razorpay_payment_id,razorpay_signature);
-    const data=await verifyCartOrder({ razorpay_order_id,
-    razorpay_payment_id,
-    razorpay_signature,
-})
-return data.success
     
    }
-   
+
+   async function handleVerifyCartOrder( {razorpay_order_id,razorpay_payment_id,razorpay_signature}) {
+     
+    const data=await VerifyCartOrder( {razorpay_order_id,razorpay_payment_id,razorpay_signature})
+    return data.success
+   }
+  
 
     return {handleAddItem,
         handleGetItems,

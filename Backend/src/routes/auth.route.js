@@ -1,6 +1,14 @@
 import { Router } from "express";
 import { registerValidation } from "../validator/auth.validator.js";
-import { GetmeController, GoogleCallback, LoginController, LogoutController, RegisterController } from "../controller/auth.controller.js";
+import { Email_Verification,
+   ForgetMailController,
+   ForgetPasswordController,
+   GetmeController, 
+   GoogleCallback, 
+   LoginController, 
+   LogoutController, 
+   RegisterController, 
+   ResendMailController} from "../controller/auth.controller.js";
 import passport from "passport";
 import { config } from "../config/config.js";
 import { AuthenticateUser } from "../middlewares/auth.middlewares.js";
@@ -23,8 +31,31 @@ router.get("/google/callback",passport.authenticate('google',{session:false,fail
   GoogleCallback
 )
 
+/** Verify_Email
+ * /api/auth/verify_email
+ */
+
+router.get("/verify-email",Email_Verification)
+/** 
+ * 
+ * /api/auth/resendMail
+ */
+
+router.post("/resendMail",ResendMailController)
+
+/** /api/auth/ForgetMail */
+
+router.post("/ForgetMail",ForgetMailController)
+
+/** /api/auth/forgetPassword */
+router.patch("/forgetPassword",AuthenticateUser,ForgetPasswordController)
+
+/** /api/auth/getme */
 router.get("/getme",AuthenticateUser,GetmeController)
 
+/**
+ * /api/auth/logout
+ */
 router.get("/logout",AuthenticateUser,LogoutController)
 
 

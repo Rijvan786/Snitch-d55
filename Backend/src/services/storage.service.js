@@ -4,7 +4,7 @@ import { config } from "../config/config.js"
 
 
 const client=new ImageKit({
-    privateKey:config.IMAGEKIT_API_KEY
+    privateKey:config.IMAGE_KIT_API_KEY
 })
 
 

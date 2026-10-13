@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { setLoading,setUser,setError } from "../state/authslice";
-import { getMe,  Login, Register, Logout } from "../service/auth.api.js";
+import { getMe,  Login, Register, Logout, ResendMail, ForgetPasswordMail, ForgetPassword } from "../service/auth.api.js";
 import { setItems } from "../../cart/state/cart.slice.jsx";
 import { useNavigate } from "react-router";
 
@@ -32,6 +32,51 @@ export function useAuth(){
               
               dispatch(setUser(data.user))
               return data.user
+        }
+        catch(err){
+                      dispatch(setError(err.message))
+        }
+        finally{
+                 dispatch(setLoading(false))
+        }
+    }
+
+      async function handleResendMail({email}){
+        try{
+              dispatch(setLoading(true))
+              
+              const data=await ResendMail({email})
+              dispatch(setUser(data.user))
+        }
+        catch(err){
+                      dispatch(setError(err.message))
+        }
+        finally{
+                 dispatch(setLoading(false))
+        }
+    }
+
+      async function handleForgetMail({email}){
+        try{
+              dispatch(setLoading(true))
+              
+              const data=await ForgetPasswordMail({email})
+              dispatch(setUser(data.user))
+        }
+        catch(err){
+                      dispatch(setError(err.message))
+        }
+        finally{
+                 dispatch(setLoading(false))
+        }
+    }
+
+      async function handleForgetPassword({NewPassword}){
+        try{
+              dispatch(setLoading(true))
+              
+              const data=await ForgetPassword({NewPassword})
+              dispatch(setUser(data.user))
         }
         catch(err){
                       dispatch(setError(err.message))
@@ -79,5 +124,5 @@ export function useAuth(){
     }
 
     
-    return{handleLogin,handleRegister,handleGetMe,handleLogout}
+    return{handleLogin,handleRegister,handleResendMail,handleForgetMail,handleForgetPassword,handleGetMe,handleLogout}
 }

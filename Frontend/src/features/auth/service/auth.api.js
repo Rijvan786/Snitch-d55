@@ -23,6 +23,26 @@ export async function Login({fullname,email,password}){
     })
     return response.data;
 }
+
+export async function ResendMail({email}){
+    
+    const response=await api.post("/resendMail",{email})
+
+    return response.data
+}
+
+export async function ForgetPasswordMail({email}){
+    console.log(email)
+    const response=await api.post("/ForgetMail",{email})
+    return response.data
+}
+ 
+export async function ForgetPassword({NewPassword}){
+      
+          const response=await api.patch("/ForgetPassword",{NewPassword})
+          return response.data 
+}
+
 export  async function getMe(){
     const response=await api.get("/getme")
     console.log(response);
@@ -33,5 +53,6 @@ export async function Logout(){
     const response = await api.get("/logout")
     return response.data
 }
+
 
 

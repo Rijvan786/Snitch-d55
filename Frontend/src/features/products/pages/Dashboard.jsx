@@ -166,6 +166,9 @@ const Dashboard = () => {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+  if(!user){
+    navigate("/")
+  } 
 
   useEffect(() => { handleGetSellerProduct(); }, []);
 
@@ -201,7 +204,10 @@ const Dashboard = () => {
             ))}
             {/* Mobile logout */}
             <button
-              onClick={handleLogout}
+              onClick={()=>{
+                handleLogout()
+                navigate("/")
+              }}
               title="Logout"
               className="flex items-center justify-center w-9 h-9 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-50 transition-colors"
             >

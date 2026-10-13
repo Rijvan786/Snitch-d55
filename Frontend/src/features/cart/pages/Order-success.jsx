@@ -26,7 +26,7 @@ const RECS = [
 const DUMMY_ITEMS = [
   {
     _id: 'd1',
-    img: 'https://images.unsplash.com/photo-1614093302611-8efc4a9a1c32?w=200&q=80&fit=crop',
+     img: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80&fit=crop',
     title: 'URBAN NOIR HOODIE',
     size: 'L', qty: 1, price: '₹2,499',
   },

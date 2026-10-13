@@ -3,11 +3,11 @@ import {  useSelector } from 'react-redux'
 import { Navigate, useNavigate } from 'react-router';
 import { useAuth } from '../hook/useAuth';
 
-const Protected = ({children,role="buyer"}) => {
+const Protected = ({children,rolex="buyer"}) => {
      const {handleGetMe}=useAuth()
      const user=useSelector(state=>state.auth.User)
      const navigate=useNavigate()
-console.log(user);
+console.log(user)
 try {
    
 
@@ -22,7 +22,7 @@ if(!user){
 if(data.role==="seller"){
       navigate("/seller/Dashboard")
      }
-     if(data.role !==rolex){
+     if(data.role !=="seller"){
             navigate("/") 
         }  
   }
