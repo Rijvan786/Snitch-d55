@@ -83,6 +83,8 @@ export const config={
     
     NODE_ENV:NODE_ENV || "development",
     
+    PORT:PORT,
+    
     IMAGE_KIT_API_KEY:IMAGE_KIT_API_KEY,
     
     EMAIL_USER:EMAIL_USER,
@@ -92,5 +94,5 @@ export const config={
     RAZORPAY_KEY_ID:RAZORPAY_KEY_ID,
     
     RAZORPAY_KEY_SECRET:RAZORPAY_KEY_SECRET
-    
+ 
 }

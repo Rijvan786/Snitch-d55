@@ -1,14 +1,14 @@
 import  app from "./src/app.js"; 
 import  connectDB from './src/config/database.js';
 import userModel from "./src/models/user.model.js";
+import { config } from "./src/config/config.js";
 
 
 
 
 
 
-
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT || 3000;
 app.get('/', (req, res) => {
   res.send('Server is running on port 3000');
 });
