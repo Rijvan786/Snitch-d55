@@ -31,7 +31,7 @@ export   async  function  AuthenticateUser(req,res,next){
                   })
                 
                }   
-                req.user=encrypted
+                req.user=user
                
                   next() 
 
@@ -67,7 +67,7 @@ export async function AuthenticateSeller(req,res,next){
          }
 
         
-         req.user=user
+         req.user=decoded
          next()
      }
      catch(err){
