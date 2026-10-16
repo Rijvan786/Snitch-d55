@@ -428,20 +428,25 @@ async function SendTokenResponse(res, user, message) {
 /*** Email Verification Route Controller */
 export async function Email_Verification(req, res) {
     try {
-        // const { token, confirm } = req.query
+        const { token } = req.query
 
-        // if (!token) {
-        //     return res.status(400).send(`
-        //         <div style="font-family:sans-serif; text-align:center; padding:40px; background:#F4F4F5; color:#18181B; min-height:100vh;">
-        //             <h2 style="color:#DC2626;">Verification Token Missing</h2>
-        //             <p style="color:#71717A;">Invalid or expired email verification link.</p>
-        //             <a href="${CLIENT_URL}/login" style="display:inline-block; padding:10px 20px; background:#09090B; color:#FFFFFF; text-decoration:none; border-radius:6px; margin-top:12px;">Return to Login</a>
-        //         </div>
-        //     `)
-        // }
+        if (!token) {
+            return res.status(400).send(`
+                <div style="font-family:sans-serif; text-align:center; padding:40px; background:#F4F4F5; color:#18181B; min-height:100vh;">
+                    <h2 style="color:#DC2626;">Verification Token Missing</h2>
+                    <p style="color:#71717A;">Invalid or expired email verification link.</p>
+                    <a href="${CLIENT_URL}/login" style="display:inline-block; padding:10px 20px; background:#09090B; color:#FFFFFF; text-decoration:none; border-radius:6px; margin-top:12px;">Return to Login</a>
+                </div>
+            `)
+        }
 
-        // const decoded = jwt.verify(token, config.JWT_SECRET)
-        const user = await userModel.findById(req.user.id)
+        const decoded = jwt.verify(token, config.JWT_SECRET)
+        const user = await userModel.findOne({
+            $or: [
+                { _id: decoded.id },
+                { email: decoded.email }
+            ]
+        })
 
         if (!user) {
             return SendStatusCode(res, 404, "User not found")
@@ -808,7 +813,7 @@ export async function GoogleCallback(req, res) {
 
     } catch (err) {
         console.error("[GoogleCallback] Error:", err)
-        return res.redirect(`/login?error=oauth_failed`)
+     return res.redirect(`${CLIENT_URL}/login?error=oauth_failed`)
     }
 }
 

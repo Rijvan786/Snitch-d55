@@ -67,7 +67,7 @@ export async function AuthenticateSeller(req,res,next){
          }
 
         
-         req.user=decoded
+         req.user=user
          next()
      }
      catch(err){

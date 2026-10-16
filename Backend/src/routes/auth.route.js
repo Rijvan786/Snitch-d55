@@ -35,7 +35,7 @@ router.get("/google/callback",passport.authenticate('google',{session:false,fail
  * /api/auth/verify_email
  */
 
-router.get("/verify-email",AuthenticateUser,Email_Verification)
+router.get("/verify-email",Email_Verification)
 /** 
  * 
  * /api/auth/resendMail
