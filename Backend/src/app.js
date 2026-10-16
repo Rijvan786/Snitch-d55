@@ -9,14 +9,19 @@ import { config } from "./config/config.js"
 import AuthRouter from "./routes/auth.route.js"
 import ProductRouter from "./routes/product.route.js"
 import CartRouter from "./routes/cart.route.js"
-
+import path from "path"
+import { fileURLToPath } from "url"
+import { dirname } from "path"
+const __filename=fileURLToPath(import.meta.url)
+const __dirname=dirname(__filename)
 
 const app=express()
 app.use(express.json())
+app.use(express.static("./public"))
 
 app.use(morgan("dev"))
 app.use(cookieParser())
-app.use(cors({
+app.use(cors({         
     origin:"http://localhost:5173",
     credentials:true
 }))
@@ -41,6 +46,9 @@ passport.use(new GoogleStrategy({
 }))
 
 
+app.use("*name",(req,res)=>{
+    res.sendFile(path.join(__dirname,".","../public/index.html"))
+})
 
 
 

@@ -31,7 +31,7 @@ export   async  function  AuthenticateUser(req,res,next){
                   })
                 
                }   
-                req.user=user
+                req.user=encrypted
                
                   next() 
 

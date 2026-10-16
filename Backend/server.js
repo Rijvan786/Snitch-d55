@@ -24,8 +24,7 @@ const startServer = async () => {
     console.error('Failed to start server:', error.message);
     process.exit(1);
   }
-   const user=await userModel.findOne({});
-    console.log(user);
+   
 };
 
 startServer();

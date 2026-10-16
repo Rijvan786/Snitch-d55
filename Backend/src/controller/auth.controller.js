@@ -4,11 +4,11 @@ import jwt from "jsonwebtoken"
 import { validatedAndFormat } from "../validator/contact.validator.js"
 import bcrypt from "bcryptjs"
 import BlackListModel from "../models/BlackList.model.js"
-import { Sendmail } from "../services/email.service.js"
+import { SendMailDynamicContent } from "../services/email.service.js"
 
 // Application Client & Base URLs
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173"
-const BASE_URL = process.env.BASE_URL || `http://localhost:${config.PORT || 3000}`
+const CLIENT_URL ="https://snitch-d55.onrender.com" || "http://localhost:5173"
+const BASE_URL = "https://snitch-d55.onrender.com" || `http://localhost:${config.PORT || 3000}`
 
 /* ==========================================================================
    CLEAN MODERN MINIMALIST EMAIL TEMPLATE SUITE (Self-Contained)
@@ -428,25 +428,20 @@ async function SendTokenResponse(res, user, message) {
 /*** Email Verification Route Controller */
 export async function Email_Verification(req, res) {
     try {
-        const { token, confirm } = req.query
+        // const { token, confirm } = req.query
 
-        if (!token) {
-            return res.status(400).send(`
-                <div style="font-family:sans-serif; text-align:center; padding:40px; background:#F4F4F5; color:#18181B; min-height:100vh;">
-                    <h2 style="color:#DC2626;">Verification Token Missing</h2>
-                    <p style="color:#71717A;">Invalid or expired email verification link.</p>
-                    <a href="${CLIENT_URL}/login" style="display:inline-block; padding:10px 20px; background:#09090B; color:#FFFFFF; text-decoration:none; border-radius:6px; margin-top:12px;">Return to Login</a>
-                </div>
-            `)
-        }
+        // if (!token) {
+        //     return res.status(400).send(`
+        //         <div style="font-family:sans-serif; text-align:center; padding:40px; background:#F4F4F5; color:#18181B; min-height:100vh;">
+        //             <h2 style="color:#DC2626;">Verification Token Missing</h2>
+        //             <p style="color:#71717A;">Invalid or expired email verification link.</p>
+        //             <a href="${CLIENT_URL}/login" style="display:inline-block; padding:10px 20px; background:#09090B; color:#FFFFFF; text-decoration:none; border-radius:6px; margin-top:12px;">Return to Login</a>
+        //         </div>
+        //     `)
+        // }
 
-        const decoded = jwt.verify(token, config.JWT_SECRET)
-        const user = await userModel.findOne({
-            $or: [
-                { _id: decoded.id },
-                { email: decoded.email }
-            ]
-        })
+        // const decoded = jwt.verify(token, config.JWT_SECRET)
+        const user = await userModel.findById(req.user.id)
 
         if (!user) {
             return SendStatusCode(res, 404, "User not found")
@@ -547,12 +542,12 @@ export async function RegisterController(req, res) {
         })
 
         // Asynchronous non-blocking dispatch for 1M+ user architecture
-        Sendmail({
-            to: user.email,
-            subject: emailContent.subject,
-            text: emailContent.text,
-            html: emailContent.html
-        }).catch(err => {
+        await SendMailDynamicContent({
+            email : user.email,
+            subject_line:`Welcome to Song.com ${user.fullname}`,
+            dynamic_html_content:emailContent.html
+
+             }).catch(err => {
             console.error(`[RegisterController] Welcome email failed to send to ${user.email}:`, err.message)
         })
 
@@ -660,11 +655,10 @@ export async function ResendMailController(req, res) {
         })
 
         // Dispatch email asynchronously
-        Sendmail({
-            to: email,
-            subject: emailContent.subject,
-            text: emailContent.text,
-            html: emailContent.html
+        SendMailDynamicContent({
+             email: email,
+            subject_line: emailContent.subject,
+            dynamic_html_content: emailContent.html
         }).catch(err => {
             console.error(`[ResendMailController] Failed to send email to ${email}:`, err.message)
         })
@@ -709,11 +703,10 @@ export async function ForgetMailController(req, res) {
         })
 
         // Dispatch email
-        Sendmail({
+        SendMailDynamicContent({
             to: email,
             subject: emailContent.subject,
-            text: emailContent.text,
-            html: emailContent.html
+            dynamic_html_content: emailContent.html
         }).catch(err => {
             console.error(`[ForgetMailController] Password reset email failed to send to ${email}:`, err.message)
         })
@@ -732,7 +725,6 @@ export async function ForgetMailController(req, res) {
 export async function ForgetPasswordController(req,res){
        
         try {    const email=req.user.email
-          console.log("Forgetpassowrd",email);
                   const {NewPassword}=req.body
                   const user=await userModel.findOne({
                     email:email
@@ -759,7 +751,7 @@ export async function GoogleCallback(req, res) {
         const email = emails && emails[0] ? emails[0].value : null
         
         if (!email) {
-            return res.redirect(`${CLIENT_URL}/login?error=email_not_provided`)
+            return res.redirect(`/login?error=email_not_provided`)
         }
 
         let user = await userModel.findOne({ email: email }).select("+password")
@@ -800,11 +792,10 @@ export async function GoogleCallback(req, res) {
         })
 
         // Dispatch email asynchronously
-        Sendmail({
-            to: user.email,
-            subject: emailContent.subject,
-            text: emailContent.text,
-            html: emailContent.html
+        SendMailDynamicContent({
+            email: user.email,
+            subject_line: emailContent.subject,
+            dynamic_html_content: emailContent.html
         }).catch(err => {
             console.error(`[GoogleCallback] Welcome email failed for ${user.email}:`, err.message)
         })
@@ -817,13 +808,14 @@ export async function GoogleCallback(req, res) {
 
     } catch (err) {
         console.error("[GoogleCallback] Error:", err)
-        return res.redirect(`${CLIENT_URL}/login?error=oauth_failed`)
+        return res.redirect(`/login?error=oauth_failed`)
     }
 }
 
 /*** Get Me Controller */
 export async function GetmeController(req, res) {
     const user = req.user
+   
 
     return res.status(200).json({
         message: "Fetch user is successfully",

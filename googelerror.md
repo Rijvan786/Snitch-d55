@@ -25,3 +25,7 @@ FATAL ERROR: Zone Allocation failed - process out of memory
 16: 00007FF721FCF483 node::AsyncResource::CallbackScope::CallbackScope+2237395
 17: 00007FF99312CDF7 BaseThreadInitThunk+23
 18: 00007FF99363EE4C RtlUserThreadStart+44
+
+
+
+mongodb+srv://rizwan786:tnlJ2hXx2lI4vA1y@cluster0.rdqouab.mongodb.net/

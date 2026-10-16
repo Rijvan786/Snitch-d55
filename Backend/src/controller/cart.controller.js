@@ -13,7 +13,7 @@ import { validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.
 export async function AddTOCartController(req,res){
     const {productId,variantId}=req.params
    const {quantity}=req.body
-   console.log(productId,variantId,quantity);
+  
     const product=await  ProductModel.findOne({
         _id:productId,
         "variants._id":variantId
@@ -25,7 +25,6 @@ export async function AddTOCartController(req,res){
         })
     }
     const stock=await stockOfVariant(productId,variantId)
-    console.log(stock);
 
     // cart is all ready  exist 
  const cart =(await CartModel.findOne({user:req.user._id}) )|| await CartModel.create({
@@ -84,7 +83,6 @@ export async function AddTOCartController(req,res){
     })
 }
 
-
 export async function  getCartController(req,res){
     const user=req.user
 
@@ -116,7 +114,6 @@ export async function IncrementCartItemQuantityController(req,res){
     
     
         console.log(price,"PRice&Quantity");
-    console.log(`${variantId} price${productId}`);
 
 
     const product=await ProductModel.findOne({
@@ -181,10 +178,10 @@ export async function IncrementCartItemQuantityController(req,res){
     })
  }
 }
+
 export async function DecrementCartItemQuantityController(req,res){
         const {productId,variantId}=req.params
         const {price,quantity}=req.body
-    console.log(`variantId${variantId} price${productId}`);
 
 
     const product=await ProductModel.findOne({
@@ -233,7 +230,6 @@ export async function DecrementCartItemQuantityController(req,res){
 
 export async function DeleteCartController(req,res){
         const {variantId,productId}=req.params
-        console.log(`variantId ${variantId} productId ${productId}`);
 
         const product=await ProductModel.find({
             _id:productId,

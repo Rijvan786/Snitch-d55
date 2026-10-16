@@ -3,7 +3,7 @@
 
 const ContinueWithGoogle = () => {
     return (
-        <a href="http://localhost:3000/api/auth/google"
+        <a href="https://snitch-d55.onrender.com/api/auth/google"
             className="flex items-center justify-center w-full bg-white border border-[#E8E2D9] px-4 py-3 text-sm font-medium text-[#7A6E63] hover:border-[#C9A96E] hover:text-[#1b1c1a] transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-[#C9A96E] focus:ring-offset-2 focus:ring-offset-[#fbf9f6] rounded"
             style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '0.04em' }}
         >

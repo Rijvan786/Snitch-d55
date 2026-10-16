@@ -2,7 +2,7 @@ import dotenv  from "dotenv";
 dotenv.config()
 
 
-const {MONGO_URI,JWT_SECRET,NODE_ENV,PORT,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REFRESH_TOKEN,GOOGLE_CLIENT_ID2,GOOGLE_CLIENT_SECRET2,EMAIL_USER,EMAIL_PASSWORD,
+const {MONGO_URI,JWT_SECRET,NODE_ENV,PORT,GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,GOOGLE_REFRESH_TOKEN,GOOGLE_CLIENT_ID2,GOOGLE_CLIENT_SECRET2,EMAIL_USER,EMAIL_PASSWORD, EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,EMAILJS_PUBLIC_KEY,EMAILJS_PRIVATE_KEY,
 IMAGE_KIT_API_KEY,RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET} =process.env
 
 if(!MONGO_URI){
@@ -22,8 +22,6 @@ if(!PORT){
     throw new Error("PORT is not defined environment variables")
 
 }
-
-
 if(!GOOGLE_CLIENT_ID){
     throw new Error("GOOGLE_CLIENT_ID is not defined environment variables")
 }
@@ -53,6 +51,25 @@ if(!EMAIL_USER){
 if(!EMAIL_PASSWORD){
     throw new Error("EMAIL_PASSWORD is not defined environment variables")
 }
+
+if(!EMAILJS_SERVICE_ID){
+    throw new Error("EMAILJS_SERVICE_ID is not defined environment variables")
+
+}
+if(!EMAILJS_TEMPLATE_ID){
+    throw new Error("EMAILJS_TEMPLATE_ID is not defined environment variables")
+
+}
+if(!EMAILJS_PUBLIC_KEY){
+    throw new Error("EMAILJS_PUBLIC_KEY is not defined environment variables")
+
+}
+if(!EMAILJS_PRIVATE_KEY){
+    throw new Error("EMAILJS_PRIVATE_KEY is not defined environment variable")
+}
+
+
+
 if(!IMAGE_KIT_API_KEY){
     throw new Error("IMAGEKIT_API_KEY is not defined environment variables")
 
@@ -93,6 +110,14 @@ export const config={
     
     EMAIL_PASSWORD:EMAIL_PASSWORD,
     
+    EMAILJS_SERVICE_ID:EMAILJS_SERVICE_ID,
+
+    EMAILJS_TEMPLATE_ID:EMAILJS_TEMPLATE_ID,
+    
+    EMAILJS_PUBLIC_KEY:EMAILJS_PUBLIC_KEY,
+
+    EMAILJS_PRIVATE_KEY:EMAILJS_PRIVATE_KEY,
+
     RAZORPAY_KEY_ID:RAZORPAY_KEY_ID,
     
     RAZORPAY_KEY_SECRET:RAZORPAY_KEY_SECRET
