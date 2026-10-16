@@ -709,8 +709,8 @@ export async function ForgetMailController(req, res) {
 
         // Dispatch email
         SendMailDynamicContent({
-            to: email,
-            subject: emailContent.subject,
+            email: email,
+            subject_line: emailContent.subject,
             dynamic_html_content: emailContent.html
         }).catch(err => {
             console.error(`[ForgetMailController] Password reset email failed to send to ${email}:`, err.message)
