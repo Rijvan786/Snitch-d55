@@ -83,11 +83,17 @@ const Login = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
 
           <div className="relative z-10 flex flex-col justify-between h-full p-10 xl:p-14">
-            <div>
-              <span className="text-[#F5C518] text-2xl font-bold tracking-[0.25em] uppercase">
-                Snitch
-              </span>
-            </div>
+            <Link to="/" className="inline-flex items-center gap-3.5 group">
+              <div className="w-12 h-12 rounded-full overflow-hidden border border-[#F5C518]/40 group-hover:border-[#F5C518] bg-black/60 backdrop-blur-md p-0.5 transition-all duration-300 group-hover:scale-105 shadow-xl shadow-black/60">
+                <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+              </div>
+              <div>
+                <span className="text-[#F5C518] text-2xl font-bold tracking-[0.25em] uppercase leading-none group-hover:text-white transition-colors">
+                  Snitch
+                </span>
+                <p className="text-[9px] text-zinc-400 tracking-[0.3em] uppercase mt-0.5">EST. 2020</p>
+              </div>
+            </Link>
             <div className="space-y-4">
               <p className="text-[10px] text-zinc-400 tracking-[0.4em] uppercase">
                 Fashion &bull; Style &bull; Culture
@@ -120,9 +126,16 @@ const Login = () => {
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 sm:px-8 lg:px-12 xl:px-16 overflow-y-auto">
 
           {/* Mobile brand header */}
-          <div className="lg:hidden mb-8 text-center">
-            <h1 className="text-3xl font-bold tracking-[0.25em] uppercase text-[#F5C518]">Snitch</h1>
-            <p className="mt-1 text-[10px] text-zinc-600 tracking-[0.35em] uppercase">
+          <div className="lg:hidden mb-8 text-center flex flex-col items-center">
+            <Link to="/" className="inline-flex flex-col items-center gap-2.5 group mb-1">
+              <div className="w-16 h-16 rounded-full overflow-hidden border border-[#F5C518]/40 group-hover:border-[#F5C518] bg-black p-0.5 transition-all duration-300 group-hover:scale-105 shadow-xl shadow-[#F5C518]/10">
+                <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-[0.25em] uppercase text-[#F5C518] group-hover:text-white transition-colors">
+                Snitch
+              </h1>
+            </Link>
+            <p className="mt-0.5 text-[10px] text-zinc-600 tracking-[0.35em] uppercase">
               Fashion &bull; Style &bull; Culture
             </p>
           </div>
@@ -131,6 +144,14 @@ const Login = () => {
 
             {/* Desktop heading */}
             <div className="hidden lg:block mb-8">
+              <Link to="/" className="inline-flex items-center gap-2.5 mb-4 group">
+                <div className="w-9 h-9 rounded-full overflow-hidden border border-[#F5C518]/40 group-hover:border-[#F5C518] bg-black p-0.5 transition-all duration-300 group-hover:scale-105 shadow-sm shadow-[#F5C518]/10">
+                  <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+                </div>
+                <span className="text-[11px] font-bold tracking-[0.25em] uppercase text-[#F5C518] group-hover:text-white transition-colors">
+                  Snitch Official
+                </span>
+              </Link>
               <h2 className="text-2xl font-bold text-white">Welcome back</h2>
               <p className="mt-1 text-sm text-zinc-500">Sign in to your Snitch account.</p>
             </div>

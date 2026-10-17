@@ -157,10 +157,23 @@ const Home = () => {
       {/* ══ NAVBAR ══════════════════════════════════════════ */}
       <nav className="fixed top-0 inset-x-0 z-50 flex items-center gap-4 px-6 xl:px-14 h-16 bg-[#0D0D0D]/95 backdrop-blur-sm border-b border-zinc-900">
         {/* Brand */}
-        <div className="shrink-0">
-          <span className="text-[#F5C518] text-lg font-extrabold tracking-[0.3em] uppercase leading-none">SNITCH</span>
-          <p className="text-[8px] text-zinc-700 tracking-[0.25em] uppercase mt-0.5">EST. 2020</p>
-        </div>
+        <Link to="/" className="flex items-center gap-3 shrink-0 group">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden bg-black/90 border border-[#F5C518]/40 group-hover:border-[#F5C518] transition-all duration-300 shadow-md shadow-[#F5C518]/10 group-hover:scale-105 group-hover:shadow-[#F5C518]/25 flex items-center justify-center p-0.5">
+            <img
+              src="/Snitch.png"
+              alt="Snitch Logo"
+              className="w-full h-full object-cover rounded-full transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
+          <div className="shrink-0">
+            <span className="text-[#F5C518] text-lg font-extrabold tracking-[0.3em] uppercase leading-none group-hover:text-white transition-colors duration-200">
+              SNITCH
+            </span>
+            <p className="text-[8px] text-zinc-600 tracking-[0.25em] uppercase mt-0.5 group-hover:text-zinc-400 transition-colors">
+              EST. 2020
+            </p>
+          </div>
+        </Link>
 
         {/* ── Live search ── */}
         <div className="flex-1 hidden sm:block max-w-md" ref={searchRef}>
@@ -386,10 +399,15 @@ const Home = () => {
 
       {/* ══ FOOTER ══════════════════════════════════════════ */}
       <footer className="border-t border-zinc-900 px-6 xl:px-14 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div>
-          <span className="text-[#F5C518] text-sm font-extrabold tracking-[0.3em] uppercase">SNITCH</span>
-          <span className="text-zinc-800 text-xs ml-4 tracking-widest">© 2025</span>
-        </div>
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-[#F5C518]/30 group-hover:border-[#F5C518] bg-black p-0.5 transition-all duration-300">
+            <img src="/Snitch.png" alt="Snitch" className="w-full h-full object-cover rounded-full" />
+          </div>
+          <div>
+            <span className="text-[#F5C518] text-sm font-extrabold tracking-[0.3em] uppercase group-hover:text-white transition-colors">SNITCH</span>
+            <span className="text-zinc-700 text-[10px] ml-3 tracking-widest">© 2026</span>
+          </div>
+        </Link>
         <div className="flex items-center gap-6">
           {["Privacy", "Terms", "Shipping", "Contact"].map((l) => (
             <a key={l} href="#" className="text-[10px] text-zinc-700 tracking-[0.15em] uppercase hover:text-zinc-400 transition-colors">{l}</a>

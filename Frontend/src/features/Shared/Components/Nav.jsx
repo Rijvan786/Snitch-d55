@@ -20,7 +20,17 @@ const Nav = () => {
           </span>
         </button>
         
-        <span className="text-[#F5C518] text-sm font-bold tracking-[0.3em] uppercase leading-none absolute left-1/2 -translate-x-1/2">SNITCH</span>
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2.5 absolute left-1/2 -translate-x-1/2 group cursor-pointer"
+        >
+          <div className="w-8 h-8 rounded-full overflow-hidden border border-[#F5C518]/40 group-hover:border-[#F5C518] bg-black p-0.5 transition-all duration-300 group-hover:scale-105 shadow-md shadow-[#F5C518]/10">
+            <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+          </div>
+          <span className="text-[#F5C518] text-sm font-bold tracking-[0.3em] uppercase leading-none group-hover:text-white transition-colors">
+            SNITCH
+          </span>
+        </button>
 
         {/* Right side — only when logged in */}
         {user && (

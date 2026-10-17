@@ -65,8 +65,13 @@ const Resend_Verify_Mail = () => {
 
       {/* ── Nav ── */}
       <header className="flex items-center justify-between px-6 sm:px-10 h-16 border-b border-zinc-900 shrink-0">
-        <Link to="/" className="text-[#F5C518] text-lg font-bold tracking-[0.28em] uppercase hover:opacity-80 transition-opacity">
-          Snitch
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-full overflow-hidden border border-[#F5C518]/40 group-hover:border-[#F5C518] bg-black p-0.5 transition-all duration-300 group-hover:scale-105 shadow-md shadow-[#F5C518]/10">
+            <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+          </div>
+          <span className="text-[#F5C518] text-lg font-bold tracking-[0.28em] uppercase group-hover:text-white transition-colors">
+            Snitch
+          </span>
         </Link>
         <button
           onClick={() => navigate(-1)}
@@ -83,29 +88,29 @@ const Resend_Verify_Mail = () => {
       <main className="flex-1 flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-[440px]">
 
-          {/* ── Icon badge ── */}
+          {/* ── Icon badge with Snitch Logo ── */}
           <div className="flex justify-center mb-8">
-            <div className="relative">
-              <div className={`w-16 h-16 rounded-2xl border flex items-center justify-center shadow-lg transition-all duration-500
-                ${sentCount > 0
-                  ? "bg-emerald-500/10 border-emerald-500/30 shadow-emerald-500/10"
-                  : "bg-[#F5C518]/10 border-[#F5C518]/20 shadow-[#F5C518]/5"
-                }`}
+            <div className="relative group">
+              <div
+                className={`w-16 h-16 rounded-full border-2 flex items-center justify-center shadow-xl transition-all duration-300 group-hover:scale-105 overflow-hidden p-0.5 bg-black
+                  ${sentCount > 0
+                    ? "border-emerald-500/50 shadow-emerald-500/20"
+                    : "border-[#F5C518]/40 group-hover:border-[#F5C518] shadow-[#F5C518]/15"
+                  }`}
               >
-                {sentCount > 0 ? (
-                  <svg className="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                ) : (
-                  <svg className="w-7 h-7 text-[#F5C518]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <img src="/Snitch.png" alt="Snitch Logo" className="w-full h-full object-cover rounded-full" />
+              </div>
+
+              {/* Status Indicator / Sent count badge */}
+              {sentCount > 0 ? (
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-emerald-500 text-black text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-500/40">
+                  {sentCount}
+                </span>
+              ) : (
+                <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#111] border border-[#F5C518]/40 flex items-center justify-center text-[#F5C518]">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
-                )}
-              </div>
-              {/* Sent count badge */}
-              {sentCount > 0 && (
-                <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-emerald-500 text-black text-[10px] font-black flex items-center justify-center shadow-lg shadow-emerald-500/40">
-                  {sentCount}
                 </span>
               )}
             </div>
