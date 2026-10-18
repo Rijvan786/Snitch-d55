@@ -549,7 +549,7 @@ export async function RegisterController(req, res) {
         // Asynchronous non-blocking dispatch for 1M+ user architecture
         await SendMailDynamicContent({
             email : user.email,
-            subject_line:`Welcome to Song.com ${user.fullname}`,
+            subject_line:emailContent.subject,
             dynamic_html_content:emailContent.html
 
              }).catch(err => {
