@@ -3,6 +3,7 @@ import { setLoading,setUser,setError } from "../state/authslice";
 import { getMe,  Login, Register, Logout, ResendMail, ForgetPasswordMail, ForgetPassword } from "../service/auth.api.js";
 import { setItems } from "../../cart/state/cart.slice.jsx";
 import { useNavigate } from "react-router";
+import { useEffect } from "react";
 
 export function useAuth(){
     const dispatch=useDispatch()
@@ -122,7 +123,10 @@ export function useAuth(){
             
         }
     }
-
     
+    useEffect(()=>{
+        // handleGetMe()
+    })
+
     return{handleLogin,handleRegister,handleResendMail,handleForgetMail,handleForgetPassword,handleGetMe,handleLogout}
 }

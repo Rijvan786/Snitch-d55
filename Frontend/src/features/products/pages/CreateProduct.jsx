@@ -135,9 +135,7 @@ CreateProduct = () => {
    const user=useSelector(s=>s.auth.user)
    const navigate = useNavigate();
 
-    if(!user){
-      navigate("/")
-    }
+
 
   /* ── consolidated form state ── */
   const [formData, setFormData] = useState({
