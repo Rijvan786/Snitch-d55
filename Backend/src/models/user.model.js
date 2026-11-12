@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs"
 const userSchema=new mongoose.Schema({
     
-    email: {
+    email:{
         type:String,
         required:true,
         unique:true
         },
     contact:{
         type:String,
-        required:false   // temperory patch 
+        required:false   // temporary patch 
 
     },
      countryCode:{   
@@ -63,11 +63,12 @@ userSchema.pre("save",async function(){
 })
 userSchema.methods.comparePassword=async function(password){
     console.log(password,this.password,"hash");
+    
     return await bcrypt.compare(password,this.password)
 }
 
 
 
-const   userModel=mongoose.model("user",userSchema)
+const  userModel=mongoose.model("user",userSchema)
 
 export default userModel

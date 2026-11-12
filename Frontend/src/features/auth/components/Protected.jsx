@@ -16,9 +16,9 @@ try {
  useEffect(()=>{
   async function fetch() {
    const data= await   handleGetMe() 
-if(!user){
+  if(!user){
    navigate("/login")
-}
+  }
 if(data.role==="seller"){
       navigate("/seller/Dashboard")
      }

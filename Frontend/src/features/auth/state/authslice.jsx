@@ -1,3 +1,4 @@
+
 import { createSlice } from "@reduxjs/toolkit";
 
 
@@ -6,7 +7,7 @@ const  Authslice=createSlice({
     initialState:{
         User:null,
         Error:null,
-        Loading:true
+        Loading:false
     },
 
     reducers:{

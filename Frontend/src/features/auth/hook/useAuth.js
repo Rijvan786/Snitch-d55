@@ -125,7 +125,7 @@ export function useAuth(){
     }
     
     useEffect(()=>{
-        // handleGetMe()
+        handleGetMe()
     })
 
     return{handleLogin,handleRegister,handleResendMail,handleForgetMail,handleForgetPassword,handleGetMe,handleLogout}

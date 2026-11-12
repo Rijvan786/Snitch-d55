@@ -96,7 +96,7 @@ async function handleCheckout() {
     const order=await handleCreateCartOrder()
     console.log(order,"Ordrer");
     const options = {
-      key: "rzp_test_Tn422YGVQZozzm",
+      key: "rzp_test_Tz6wMaC3DTNa35",
       amount: order.amount, // Amount in paise
       currency: order.currency,
       name: "Snitch",
