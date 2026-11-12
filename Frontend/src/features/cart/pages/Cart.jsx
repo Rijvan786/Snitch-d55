@@ -96,7 +96,7 @@ async function handleCheckout() {
     const order=await handleCreateCartOrder()
     console.log(order,"Ordrer");
     const options = {
-      key: "rzp_test_Tz6wMaC3DTNa35",
+      key:import.meta.env.VITE_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
       amount: order.amount, // Amount in paise
       currency: order.currency,
       name: "Snitch",
