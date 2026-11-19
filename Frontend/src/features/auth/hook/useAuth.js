@@ -15,9 +15,11 @@ export function useAuth(){
               
               const data=await Register({email,fullname,contact,password,isSeller})
               dispatch(setUser(data.user))
+              return data
         }
         catch(err){
-                      dispatch(setError(err.message))
+              dispatch(setError(err.message))
+              throw err;
         }
         finally{
                  dispatch(setLoading(false))
@@ -32,10 +34,11 @@ export function useAuth(){
               console.log(data);
               
               dispatch(setUser(data.user))
-              return data.user
+              return data
         }
         catch(err){
-                      dispatch(setError(err.message))
+              dispatch(setError(err.message))
+              throw err;
         }
         finally{
                  dispatch(setLoading(false))
@@ -48,9 +51,11 @@ export function useAuth(){
               
               const data=await ResendMail({email})
               dispatch(setUser(data.user))
+              return data
         }
         catch(err){
-                      dispatch(setError(err.message))
+              dispatch(setError(err.message))
+              throw err;
         }
         finally{
                  dispatch(setLoading(false))
@@ -63,9 +68,11 @@ export function useAuth(){
               
               const data=await ForgetPasswordMail({email})
               dispatch(setUser(data.user))
+              return data
         }
         catch(err){
-                      dispatch(setError(err.message))
+              dispatch(setError(err.message))
+              throw err;
         }
         finally{
                  dispatch(setLoading(false))
@@ -78,9 +85,11 @@ export function useAuth(){
               
               const data=await ForgetPassword({NewPassword})
               dispatch(setUser(data.user))
+              return data
         }
         catch(err){
-                      dispatch(setError(err.message))
+              dispatch(setError(err.message))
+              throw err;
         }
         finally{
                  dispatch(setLoading(false))

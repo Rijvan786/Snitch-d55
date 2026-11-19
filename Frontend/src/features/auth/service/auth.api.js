@@ -1,6 +1,6 @@
 import axios from "axios";
 const api=axios.create({
-    baseURL:"https://snitch-d55.onrender.com/api/auth",
+    baseURL:"http://localhost:3000/api/auth",
     withCredentials:true
 })
 

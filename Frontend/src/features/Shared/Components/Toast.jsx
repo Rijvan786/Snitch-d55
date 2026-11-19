@@ -2,14 +2,85 @@ import React, { useEffect, useRef, useState } from "react";
 
 /* ══════════════════════════════════════════════════════
    SnitchToast — Global Top-Right Notification System
+   (Preserves 100% theme & style, adds FRRF_Plumbing friendly logic)
    Usage:
      const { toasts, showToast } = useToast();
      showToast("success", "Email sent!")
      showToast("error", "Something went wrong")
+     showToast({ type: "error", message: err })
      <ToastContainer toasts={toasts} onRemove={removeToast} />
 ══════════════════════════════════════════════════════ */
 
 const DURATION = 4000; // ms before auto-dismiss
+
+/**
+ * Converts technical API error messages, status codes, and exceptions
+ * into warm, polite, and human-friendly sentences (inspired by FRRF_Plumbing).
+ */
+export function formatFriendlyMessage(rawMsg, type = "info") {
+  if (!rawMsg) {
+    return type === "error"
+      ? "Oops! Something went wrong. Please check your information and try again."
+      : "Action completed successfully!";
+  }
+
+  // Extract from Axios error, standard Error, or plain string
+  let msg = typeof rawMsg === "object"
+    ? rawMsg?.response?.data?.message || rawMsg?.message || JSON.stringify(rawMsg)
+    : String(rawMsg);
+
+  // Clean raw prefixes
+  msg = msg.replace(/^Error:\s*/i, "").trim();
+  const lower = msg.toLowerCase();
+
+  // Network & Connectivity errors
+  if (lower.includes("network error") || lower.includes("econnrefused") || lower.includes("failed to fetch")) {
+    return "We're having trouble connecting right now. Please check your internet connection.";
+  }
+
+  // User / Email Not Found
+  if (
+    lower.includes("user is not found") ||
+    lower.includes("user not found") ||
+    lower.includes("not found") ||
+    lower.includes("no user")
+  ) {
+    return "Account not found with this email or username. Please check your details or create an account.";
+  }
+
+  // Password / Credentials Errors
+  if (
+    lower.includes("invalid password") ||
+    lower.includes("incorrect password") ||
+    lower.includes("wrong password") ||
+    lower.includes("password does not match") ||
+    lower.includes("invalid credentials")
+  ) {
+    return "Incorrect password. Please double-check your password and try again.";
+  }
+
+  // Duplicate Account / Registration
+  if (
+    lower.includes("already registered") ||
+    lower.includes("already exists") ||
+    lower.includes("duplicate key") ||
+    lower.includes("e11000")
+  ) {
+    return "An account with this email or contact is already registered. Please sign in directly.";
+  }
+
+  // Session / JWT Expiry
+  if (lower.includes("jwt expired") || lower.includes("token expired") || lower.includes("unauthorized") || lower.includes("401")) {
+    return "Your session has expired for security. Please sign in again.";
+  }
+
+  // Rate Limiting / 429
+  if (lower.includes("wait before") || lower.includes("too many requests") || lower.includes("429")) {
+    return "Please wait a moment before trying again.";
+  }
+
+  return msg;
+}
 
 /* ── Single Toast Card ── */
 export const ToastCard = ({ toast, onRemove }) => {
@@ -157,9 +228,21 @@ let _id = 0;
 export const useToast = () => {
   const [toasts, setToasts] = useState([]);
 
-  const showToast = (type, message) => {
+  const showToast = (typeOrObj, message) => {
+    let type = "info";
+    let rawMsg = "";
+
+    if (typeof typeOrObj === "object" && typeOrObj !== null) {
+      type = typeOrObj.type || "info";
+      rawMsg = typeOrObj.message || typeOrObj.msg || "";
+    } else {
+      type = typeOrObj || "info";
+      rawMsg = message;
+    }
+
+    const friendlyMessage = formatFriendlyMessage(rawMsg, type);
     const id = ++_id;
-    setToasts((prev) => [...prev, { id, type, message }]);
+    setToasts((prev) => [...prev, { id, type, message: friendlyMessage }]);
   };
 
   const removeToast = (id) => {

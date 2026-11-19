@@ -35,21 +35,28 @@ const Login = () => {
       showToast("error", "Please enter your email or username.");
       return;
     }
+
     if (!formData.password) {
       showToast("error", "Please enter your password.");
       return;
     }
 
     setIsLoading(true);
+
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier.trim());
+    const payload = isEmail
+      ? { email: formData.identifier.trim(), password: formData.password }
+      : { fullname: formData.identifier.trim(), password: formData.password };
+
     try {
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.identifier.trim());
-      const payload = isEmail
-        ? { email: formData.identifier.trim(), password: formData.password }
-        : { fullname: formData.identifier.trim(), password: formData.password };
+      const data = await handleLogin(payload);
+      const user = data?.user;
 
-      const user = await handleLogin(payload);
+      if (!user) {
+        throw new Error("Login failed. Invalid account details.");
+      }
 
-      showToast("success", `Welcome back, ${user?.fullname ?? "trendsetter"}! 🎉`);
+      showToast("success", `Welcome back, ${user.fullname || "trendsetter"}! 🎉`);
 
       setTimeout(() => {
         if (user.role === "seller") {
@@ -177,7 +184,7 @@ const Login = () => {
                   required
                   autoComplete="username"
                   placeholder="Enter your email or username"
-                  value={formData.identifier}
+                  value={formData.identifier}   
                   onChange={handleChange}
                   className="w-full bg-[#1A1A1A] border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white placeholder-zinc-600
                              focus:outline-none focus:border-[#F5C518]/70 focus:ring-1 focus:ring-[#F5C518]/30
