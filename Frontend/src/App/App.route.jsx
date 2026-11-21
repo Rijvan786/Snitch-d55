@@ -16,6 +16,7 @@ import OrderSuccess from "../features/cart/pages/Order-success";
 import Forgetmail from "../features/auth/pages/Forgetmail";
 import ForgetPassword from "../features/auth/pages/ForgetPassword";
 import Resend_Verify_Mail from "../features/auth/pages/Resend_Verify_Mail";
+import Notfound from "../features/auth/components/Notfound";
 
 
 
@@ -102,7 +103,10 @@ export const router=createBrowserRouter([{
         },
    
     ]
+},
+{
+    path: "*",
+    element: <Notfound />
 }
-
 
 ])
